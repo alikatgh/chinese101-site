@@ -79,5 +79,24 @@
     track('character_preview', {character: button.dataset.character});
   }));
   document.querySelectorAll('[data-track]').forEach(link => link.addEventListener('click', () => track('cta_click', {cta: link.dataset.track})));
+  document.addEventListener('chinese101:demo', event => {
+    const allowed = ['strokes', 'context', 'audio', 'memory', 'progress', 'comfort'];
+    if (allowed.includes(event.detail?.feature)) track('feature_preview', {feature: event.detail.feature});
+  });
+  const motionButton = document.querySelector('.hero-motion-control');
+  if (motionButton) {
+    const art = document.getElementById('hero-art');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let paused = reduced.matches;
+    const update = () => {
+      art.classList.toggle('motion-running', !paused && !reduced.matches);
+      motionButton.hidden = reduced.matches;
+      motionButton.textContent = paused ? 'Play animation' : 'Pause animation';
+      motionButton.setAttribute('aria-pressed', String(paused));
+    };
+    motionButton.addEventListener('click', () => { paused = !paused; update(); });
+    reduced.addEventListener('change', () => { paused = reduced.matches; update(); });
+    update();
+  }
   startAnalytics();
 })();
