@@ -61,10 +61,6 @@ body:not(.marketing)>main,body:not(.marketing)>nav,body:not(.marketing)>footer{m
 .beta-content>img{border-radius:18px;margin-bottom:26px}
 .photo-beta .beta-copy,.photo-beta .small-note{color:#505347}
 .photo-beta .beta-status{background:#fbf8f1cf;border-color:#b5a990}
-.blog-heading{display:grid;grid-template-columns:1.35fr 1fr;gap:44px;align-items:center}
-.blog-heading>div{min-width:0}
-.editorial .blog-heading h1{font-size:clamp(43px,4.7vw,64px)!important}
-.blog-heading-photo{display:block;width:100%;height:420px;object-fit:cover;border-radius:120px 120px 12px 12px;object-position:48% center}
 .photo-post{display:grid;grid-template-columns:1fr 1.2fr;padding:0;overflow:hidden}
 .post-photo{display:block;min-height:360px}
 .post-photo img{display:block;width:100%;height:100%;object-fit:cover}
@@ -72,8 +68,6 @@ body:not(.marketing)>main,body:not(.marketing)>nav,body:not(.marketing)>footer{m
 .editorial .photo-post h2{font-size:34px!important}
 .article-photo{display:block;width:100%;height:auto;border-radius:12px;margin:32px 0 42px}
 @media(max-width:800px){
- .blog-heading{grid-template-columns:1fr;gap:28px}
- .blog-heading-photo{height:260px;border-radius:12px;object-position:center 55%}
  .photo-post{grid-template-columns:1fr}
  .post-photo{min-height:0;height:260px}
  .post-copy{padding:24px 28px}
@@ -89,7 +83,7 @@ body:not(.marketing)>main,body:not(.marketing)>nav,body:not(.marketing)>footer{m
  .photo-beta .section-lead br{display:none}
  .post-copy{padding:22px 24px}
  .editorial .photo-post h2{font-size:30px!important}
- .blog-heading-photo,.post-photo{height:230px}
+ .post-photo{height:230px}
 }
 
 /* A quiet, real-time light study around the plan comparison. */
@@ -103,3 +97,30 @@ body:not(.marketing)>main,body:not(.marketing)>nav,body:not(.marketing)>footer{m
 .plans-motion-control:hover{background:#fffdf8}
 .plans-grid .plan{box-shadow:0 12px 35px #293a2510}
 @media(max-width:640px){.plans-heading{padding-right:0}.plans-motion-control{position:static;margin-top:22px}.plans-heading:has(.plans-motion-control:not([hidden]))+.plans-grid{margin-top:25px}}
+
+/* The blog opens into the same landscape as the product homepage. */
+.editorial-main.blog-main{max-width:none!important;padding:0!important}
+.blog-hero{position:relative;isolation:isolate;display:grid;align-items:center;min-height:640px;padding:95px 0 115px;text-align:center;overflow:hidden}
+.blog-hero .section-photo img{object-position:center 54%}
+.blog-hero:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,#fbf8f1 0%,#fbf8f110 22%,#fbf8f120 74%,#fbf8f1 100%),linear-gradient(90deg,#fbf8f105,#fbf8f1c9 32%,#fbf8f1dc 50%,#fbf8f1c9 68%,#fbf8f105)}
+.editorial .blog-hero h1{font-size:clamp(52px,6.5vw,88px)!important;line-height:1.06;margin-bottom:28px}
+.editorial .blog-hero .eyebrow{margin:0 0 25px;color:#514e3e}
+.editorial .blog-hero .lead{max-width:600px;margin:0 auto 22px;color:#4d5145;font-size:21px}
+.blog-hero .text-link{margin-top:12px}
+.blog-feed{width:min(1040px,calc(100% - 80px));margin:auto;padding:65px 0 100px}
+@media(max-width:640px){
+ .blog-hero{min-height:570px;padding:75px 0 95px}
+ .blog-hero .section-photo img{object-position:42% center}
+ .blog-hero:before{background:linear-gradient(180deg,#fbf8f1 0%,#fbf8f185 22%,#fbf8f1c9 48%,#fbf8f175 76%,#fbf8f1 100%)}
+ .editorial .blog-hero h1{font-size:clamp(43px,11.5vw,64px)!important}
+ .editorial .blog-hero .lead{font-size:18px;max-width:340px}
+ .blog-feed{width:calc(100% - 48px);padding:35px 0 65px}
+}
+
+.article-hero{min-height:680px}
+.article-hero .section-photo img{object-position:center 55%}
+.article-hero:before{background:linear-gradient(180deg,#fbf8f1 0%,#fbf8f130 22%,#fbf8f135 75%,#fbf8f1 100%),linear-gradient(90deg,#fbf8f125,#fbf8f1e8 30%,#fbf8f1ed 50%,#fbf8f1e8 70%,#fbf8f125)}
+.editorial .article-hero .post-date{margin:32px 0 24px!important;font-size:11px}
+.editorial .article-hero .lead{max-width:700px;font-size:20px;line-height:1.7}
+.article-body{width:calc(100% - 80px);padding:35px 0 90px}
+@media(max-width:640px){.article-hero{min-height:650px;padding:45px 0 75px}.article-hero:before{background:linear-gradient(180deg,#fbf8f1 0%,#fbf8f1de 20%,#fbf8f1eb 55%,#fbf8f1b5 82%,#fbf8f1 100%)}.editorial .article-hero .lead{font-size:17px}.article-body{width:calc(100% - 48px);padding:10px 0 65px}}
