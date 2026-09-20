@@ -1,21 +1,24 @@
 (() => {
   'use strict';
   const key = 'chinese101.language';
-  const spanish = location.pathname === '/es' || location.pathname.startsWith('/es/');
-  const language = spanish ? 'es' : 'en';
-  // Explicit language URLs always win. The saved choice applies to later visits.
-  if (!spanish) {
+  const match = location.pathname.match(/^\/(es|vi)(?:\/|$)/);
+  const language = match ? match[1] : 'en';
+  const vietnamesePaths = new Set(['/', '/learn/', '/support/', '/privacy/', '/terms/']);
+  // Explicit translated URLs take precedence over a previously saved choice.
+  if (!match) {
     try {
-      if (localStorage.getItem(key) === 'es' && !new URL(location.href).searchParams.has('language')) {
-        location.replace('/es' + location.pathname + location.search + location.hash);
+      const saved = localStorage.getItem(key);
+      if (['es', 'vi'].includes(saved) && !new URL(location.href).searchParams.has('language')) {
+        const path = saved === 'vi' && !vietnamesePaths.has(location.pathname) ? '/' : location.pathname;
+        location.replace('/' + saved + path + location.search + location.hash);
         return;
       }
-    } catch (_) { /* The links still work when browser storage is unavailable. */ }
+    } catch (_) { /* Language links also work without storage. */ }
   }
   document.addEventListener('click', event => {
     const link = event.target.closest('a[data-language]');
     if (!link) return;
-    try { localStorage.setItem(key, link.dataset.language); } catch (_) { /* URL persists this visit. */ }
+    try { localStorage.setItem(key, link.dataset.language); } catch (_) { /* URL remains explicit. */ }
   });
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-language]').forEach(link => {

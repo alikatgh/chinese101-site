@@ -1,1 +1,12 @@
-{"release":"2026-09-20-localization-es","websiteLocales":["en","es"],"spanishLessons":702,"spanishDictionaryEntries":3500}
+{
+  "release": "2026-09-21-localization-vi",
+  "websiteLocales": [
+    "en",
+    "es",
+    "vi"
+  ],
+  "spanishLessons": 702,
+  "spanishDictionaryEntries": 3500,
+  "vietnameseLessons": 19,
+  "vietnameseDictionaryEntries": 242
+}
