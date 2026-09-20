@@ -140,3 +140,9 @@ body:not(.marketing)>main,body:not(.marketing)>nav,body:not(.marketing)>footer{m
 .scenic-heading .lead{max-width:610px;margin:0;color:#4b5045}
 .scenic-support h1{font-size:clamp(44px,5.5vw,68px)!important}
 @media(max-width:800px){.scenic-heading{margin:0 -8px 40px;padding:38px 26px;min-height:400px}.scenic-heading:before{background:linear-gradient(90deg,#fbf8f1ed,#fbf8f1c9 60%,#fbf8f17a)}.scenic-heading .lead{font-size:18px}}
+
+/* Language links remain available on small screens and without JavaScript. */
+.site-header{flex-wrap:wrap;gap:16px}.site-header nav{flex-wrap:wrap;align-items:center}
+.language-switch{display:flex;gap:12px;align-items:center;font:13px/1.5 system-ui;padding:8px 0}.language-switch a{white-space:nowrap}.language-switch [aria-current=true]{color:var(--ink);font-weight:750;text-decoration-thickness:2px}
+body>nav{flex-wrap:wrap;gap:12px}body>nav>.language-switch{margin-left:auto}
+@media(max-width:800px){.site-header>.language-switch{margin-left:auto}.site-header nav{order:3;width:100%}}

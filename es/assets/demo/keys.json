@@ -1,0 +1,507 @@
+[
+  {
+    "han": "一",
+    "py": "yī",
+    "en": "uno"
+  },
+  {
+    "han": "丨",
+    "py": "gǔn",
+    "en": "línea"
+  },
+  {
+    "han": "丶",
+    "py": "zhǔ",
+    "en": "punto"
+  },
+  {
+    "han": "丿",
+    "py": "piě",
+    "en": "barra"
+  },
+  {
+    "han": "乙",
+    "py": "yǐ",
+    "en": "segundo"
+  },
+  {
+    "han": "亅",
+    "py": "jué",
+    "en": "gancho"
+  },
+  {
+    "han": "二",
+    "py": "èr",
+    "en": "dos"
+  },
+  {
+    "han": "亠",
+    "py": "tóu",
+    "en": "tapa"
+  },
+  {
+    "han": "人",
+    "py": "rén",
+    "en": "persona"
+  },
+  {
+    "han": "儿",
+    "py": "ér",
+    "en": "piernas"
+  },
+  {
+    "han": "八",
+    "py": "bā",
+    "en": "ocho"
+  },
+  {
+    "han": "冫",
+    "py": "bīng",
+    "en": "hielo"
+  },
+  {
+    "han": "刀",
+    "py": "dāo",
+    "en": "cuchillo"
+  },
+  {
+    "han": "力",
+    "py": "lì",
+    "en": "potencia"
+  },
+  {
+    "han": "十",
+    "py": "shí",
+    "en": "diez"
+  },
+  {
+    "han": "卜",
+    "py": "bǔ",
+    "en": "adivinación"
+  },
+  {
+    "han": "厂",
+    "py": "chǎng",
+    "en": "acantilado"
+  },
+  {
+    "han": "又",
+    "py": "yòu",
+    "en": "de nuevo"
+  },
+  {
+    "han": "口",
+    "py": "kǒu",
+    "en": "boca"
+  },
+  {
+    "han": "囗",
+    "py": "wéi",
+    "en": "anexo"
+  },
+  {
+    "han": "土",
+    "py": "tǔ",
+    "en": "Tierra"
+  },
+  {
+    "han": "夕",
+    "py": "xī",
+    "en": "tarde"
+  },
+  {
+    "han": "大",
+    "py": "dà",
+    "en": "grande"
+  },
+  {
+    "han": "女",
+    "py": "nǚ",
+    "en": "mujer"
+  },
+  {
+    "han": "子",
+    "py": "zǐ",
+    "en": "niño"
+  },
+  {
+    "han": "宀",
+    "py": "mián",
+    "en": "techo"
+  },
+  {
+    "han": "寸",
+    "py": "cùn",
+    "en": "pulgadas"
+  },
+  {
+    "han": "小",
+    "py": "xiǎo",
+    "en": "pequeño"
+  },
+  {
+    "han": "尸",
+    "py": "shī",
+    "en": "cuerpo"
+  },
+  {
+    "han": "山",
+    "py": "shān",
+    "en": "montaña"
+  },
+  {
+    "han": "川",
+    "py": "chuān",
+    "en": "río"
+  },
+  {
+    "han": "工",
+    "py": "gōng",
+    "en": "trabajo"
+  },
+  {
+    "han": "己",
+    "py": "jǐ",
+    "en": "yo mismo"
+  },
+  {
+    "han": "巾",
+    "py": "jīn",
+    "en": "tela"
+  },
+  {
+    "han": "干",
+    "py": "gān",
+    "en": "escudo"
+  },
+  {
+    "han": "广",
+    "py": "guǎng",
+    "en": "refugio"
+  },
+  {
+    "han": "弓",
+    "py": "gōng",
+    "en": "arco"
+  },
+  {
+    "han": "彳",
+    "py": "chì",
+    "en": "paso"
+  },
+  {
+    "han": "心",
+    "py": "xīn",
+    "en": "corazón"
+  },
+  {
+    "han": "户",
+    "py": "hù",
+    "en": "puerta"
+  },
+  {
+    "han": "手",
+    "py": "shǒu",
+    "en": "mano"
+  },
+  {
+    "han": "文",
+    "py": "wén",
+    "en": "escritura"
+  },
+  {
+    "han": "方",
+    "py": "fāng",
+    "en": "cuadrado"
+  },
+  {
+    "han": "日",
+    "py": "rì",
+    "en": "sol"
+  },
+  {
+    "han": "月",
+    "py": "yuè",
+    "en": "luna"
+  },
+  {
+    "han": "木",
+    "py": "mù",
+    "en": "madera"
+  },
+  {
+    "han": "气",
+    "py": "qì",
+    "en": "vapor"
+  },
+  {
+    "han": "水",
+    "py": "shuǐ",
+    "en": "agua"
+  },
+  {
+    "han": "火",
+    "py": "huǒ",
+    "en": "fuego"
+  },
+  {
+    "han": "父",
+    "py": "fù",
+    "en": "padre"
+  },
+  {
+    "han": "牛",
+    "py": "niú",
+    "en": "buey"
+  },
+  {
+    "han": "犬",
+    "py": "quǎn",
+    "en": "perro"
+  },
+  {
+    "han": "玉",
+    "py": "yù",
+    "en": "jade"
+  },
+  {
+    "han": "生",
+    "py": "shēng",
+    "en": "vida"
+  },
+  {
+    "han": "用",
+    "py": "yòng",
+    "en": "uso"
+  },
+  {
+    "han": "田",
+    "py": "tián",
+    "en": "campo"
+  },
+  {
+    "han": "疒",
+    "py": "nè",
+    "en": "enfermedad"
+  },
+  {
+    "han": "白",
+    "py": "bái",
+    "en": "blanco"
+  },
+  {
+    "han": "皮",
+    "py": "pí",
+    "en": "piel"
+  },
+  {
+    "han": "皿",
+    "py": "mǐn",
+    "en": "plato"
+  },
+  {
+    "han": "目",
+    "py": "mù",
+    "en": "ojo"
+  },
+  {
+    "han": "矢",
+    "py": "shǐ",
+    "en": "flecha"
+  },
+  {
+    "han": "石",
+    "py": "shí",
+    "en": "piedra"
+  },
+  {
+    "han": "示",
+    "py": "shì",
+    "en": "altar"
+  },
+  {
+    "han": "禾",
+    "py": "hé",
+    "en": "grano"
+  },
+  {
+    "han": "穴",
+    "py": "xué",
+    "en": "cueva"
+  },
+  {
+    "han": "立",
+    "py": "lì",
+    "en": "soporte"
+  },
+  {
+    "han": "竹",
+    "py": "zhú",
+    "en": "bambú"
+  },
+  {
+    "han": "米",
+    "py": "mǐ",
+    "en": "arroz"
+  },
+  {
+    "han": "纟",
+    "py": "sī",
+    "en": "seda"
+  },
+  {
+    "han": "网",
+    "py": "wǎng",
+    "en": "neto"
+  },
+  {
+    "han": "羊",
+    "py": "yáng",
+    "en": "oveja"
+  },
+  {
+    "han": "羽",
+    "py": "yǔ",
+    "en": "pluma"
+  },
+  {
+    "han": "耳",
+    "py": "ěr",
+    "en": "oreja"
+  },
+  {
+    "han": "肉",
+    "py": "ròu",
+    "en": "carne"
+  },
+  {
+    "han": "舟",
+    "py": "zhōu",
+    "en": "barco"
+  },
+  {
+    "han": "艮",
+    "py": "gèn",
+    "en": "romo"
+  },
+  {
+    "han": "虫",
+    "py": "chóng",
+    "en": "insecto"
+  },
+  {
+    "han": "血",
+    "py": "xuè",
+    "en": "sangre"
+  },
+  {
+    "han": "衣",
+    "py": "yī",
+    "en": "ropa"
+  },
+  {
+    "han": "西",
+    "py": "xī",
+    "en": "oeste"
+  },
+  {
+    "han": "见",
+    "py": "jiàn",
+    "en": "Ver"
+  },
+  {
+    "han": "言",
+    "py": "yán",
+    "en": "voz"
+  },
+  {
+    "han": "贝",
+    "py": "bèi",
+    "en": "concha"
+  },
+  {
+    "han": "走",
+    "py": "zǒu",
+    "en": "paso"
+  },
+  {
+    "han": "足",
+    "py": "zú",
+    "en": "pie"
+  },
+  {
+    "han": "车",
+    "py": "chē",
+    "en": "carrito"
+  },
+  {
+    "han": "邑",
+    "py": "yì",
+    "en": "ciudad"
+  },
+  {
+    "han": "里",
+    "py": "lǐ",
+    "en": "pueblo"
+  },
+  {
+    "han": "金",
+    "py": "jīn",
+    "en": "metal"
+  },
+  {
+    "han": "长",
+    "py": "cháng",
+    "en": "largo"
+  },
+  {
+    "han": "门",
+    "py": "mén",
+    "en": "puerta"
+  },
+  {
+    "han": "雨",
+    "py": "yǔ",
+    "en": "lluvia"
+  },
+  {
+    "han": "食",
+    "py": "shí",
+    "en": "comida"
+  },
+  {
+    "han": "马",
+    "py": "mǎ",
+    "en": "caballo"
+  },
+  {
+    "han": "鱼",
+    "py": "yú",
+    "en": "pescado"
+  },
+  {
+    "han": "鸟",
+    "py": "niǎo",
+    "en": "pájaro"
+  },
+  {
+    "han": "艹",
+    "py": "cǎo",
+    "en": "hierba"
+  },
+  {
+    "han": "页",
+    "py": "yè",
+    "en": "página"
+  },
+  {
+    "han": "风",
+    "py": "fēng",
+    "en": "viento"
+  },
+  {
+    "han": "黑",
+    "py": "hēi",
+    "en": "negro"
+  }
+]

@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://chinese.aulenor.com/</loc></url>
-  <url><loc>https://chinese.aulenor.com/support/</loc></url>
-  <url><loc>https://chinese.aulenor.com/privacy/</loc></url>
-  <url><loc>https://chinese.aulenor.com/terms/</loc></url>
   <url><loc>https://chinese.aulenor.com/blog/</loc></url>
   <url><loc>https://chinese.aulenor.com/blog/meet-chinese-101/</loc></url>
   <url><loc>https://chinese.aulenor.com/changelog/</loc></url>
   <url><loc>https://chinese.aulenor.com/feedback/</loc></url>
+  <url><loc>https://chinese.aulenor.com/</loc></url>
+  <url><loc>https://chinese.aulenor.com/privacy/</loc></url>
+  <url><loc>https://chinese.aulenor.com/support/</loc></url>
+  <url><loc>https://chinese.aulenor.com/terms/</loc></url>
+  <url><loc>https://chinese.aulenor.com/es/blog/</loc></url>
+  <url><loc>https://chinese.aulenor.com/es/blog/meet-chinese-101/</loc></url>
+  <url><loc>https://chinese.aulenor.com/es/changelog/</loc></url>
+  <url><loc>https://chinese.aulenor.com/es/feedback/</loc></url>
+  <url><loc>https://chinese.aulenor.com/es/</loc></url>
+  <url><loc>https://chinese.aulenor.com/es/privacy/</loc></url>
+  <url><loc>https://chinese.aulenor.com/es/support/</loc></url>
+  <url><loc>https://chinese.aulenor.com/es/terms/</loc></url>
 </urlset>

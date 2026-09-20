@@ -1,6 +1,7 @@
 (() => {
   'use strict';
   const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const labels = {characters: 'Characters', keys: 'Keys', discover: 'Discover', context: 'Context', recall: 'Recall'};
   const norm = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
   const asset = name => '/assets/demo/' + name;
   let dataPromise;
@@ -65,7 +66,7 @@
       const total=Math.max(1,Math.ceil(matches.length/9));page=Math.min(page,total-1);
       const list=body.querySelector('.demo-char-grid');
       list.innerHTML=matches.slice(page*9,page*9+9).map(c=>`<button type="button" data-han="${esc(c.han)}" aria-label="${esc(c.han+' '+c.py+' '+c.en)}"><span lang="zh">${esc(c.han)}</span><small>${esc(c.py)}</small></button>`).join('')||'<p class="demo-empty">No characters found. Try “rain”, “yu” or “雨”.</p>';
-      body.querySelector('.demo-result-count').textContent=`${matches.length.toLocaleString()} ${mode==='keys'?(matches.length===1?'key':'keys'):(matches.length===1?'character':'characters')}`;
+      body.querySelector('.demo-result-count').textContent=`${matches.length.toLocaleString()} ${labels[mode]}`;
       body.querySelector('.demo-page-count').textContent=`Page ${page+1} / ${total}`;
       body.querySelector('[data-library=prev]').disabled=page===0;
       body.querySelector('[data-library=next]').disabled=page===total-1;
@@ -79,7 +80,7 @@
     function detail(han){
       selection=searchable[mode].find(c=>c.han===han);if(!selection)return;
       const c=selection;
-      body.innerHTML=`<button type="button" class="demo-back" data-library="back">← Back to ${mode}</button><h3 class="demo-han" lang="zh" tabindex="-1">${esc(c.han)}</h3><p class="demo-pinyin">${esc(c.py)}</p><p class="demo-definition">${esc(c.en)}</p>${c.strokes?`<p class="demo-local-note">${c.strokes} strokes</p>`:''}<div class="demo-stroke"></div><p class="demo-local-note">${content.strokes[c.han]?'Use the arrows or play the stroke sequence.':'This web demo includes stroke guides for selected characters.'}</p>`;
+      body.innerHTML=`<button type="button" class="demo-back" data-library="back">← Back to ${labels[mode]}</button><h3 class="demo-han" lang="zh" tabindex="-1">${esc(c.han)}</h3><p class="demo-pinyin">${esc(c.py)}</p><p class="demo-definition">${esc(c.en)}</p>${c.strokes?`<p class="demo-local-note">${c.strokes} strokes</p>`:''}<div class="demo-stroke"></div><p class="demo-local-note">${content.strokes[c.han]?'Use the arrows or play the stroke sequence.':'This web demo includes stroke guides for selected characters.'}</p>`;
       if(content.strokes[c.han])strokeCleanup=makeStroke(body.querySelector('.demo-stroke'),content.strokes[c.han].strokes,c.han);
       body.querySelector('h3').focus();body.scrollTop=0;
     }
@@ -100,7 +101,7 @@
     function render(focus=false){
       stopAudio();
       if(complete){body.innerHTML='<div class="demo-complete"><span lang="zh">雨</span><h3>A little more familiar.</h3><p>You finished this sample character.</p><p class="demo-local-note">This demo does not save or sync app progress.</p><button type="button" class="demo-primary" data-practice="restart">Try again</button></div>';return;}
-      body.innerHTML=`<p class="demo-local-note">One sample character · Rain</p><div class="demo-segments practice-tabs">${['discover','context','recall'].map((name,i)=>`<button type="button" data-practice="${name}" aria-pressed="${step===name}">${i+1} ${name[0].toUpperCase()+name.slice(1)}</button>`).join('')}</div><div class="practice-content"></div><p class="demo-audio-status" role="status"></p>`;
+      body.innerHTML=`<p class="demo-local-note">One sample character · Rain</p><div class="demo-segments practice-tabs">${['discover','context','recall'].map((name,i)=>`<button type="button" data-practice="${name}" aria-pressed="${step===name}">${i+1} ${labels[name]}</button>`).join('')}</div><div class="practice-content"></div><p class="demo-audio-status" role="status"></p>`;
       const screen=body.querySelector('.practice-content');
       if(step==='discover')screen.innerHTML=`<div class="practice-glyph" lang="zh">雨</div><p class="demo-pinyin">yǔ</p><h3>rain</h3><details class="demo-memory" ${memory?'open':''}><summary>Memory picture</summary><img src="${asset('memory-rain.png')}" alt="An ink cloud with four falling raindrops, a memory illustration for rain" loading="lazy"><p>A cloud and falling drops. A visual association for 雨.</p></details><button type="button" class="demo-primary" data-practice="context">See an example →</button>`;
       if(step==='context')screen.innerHTML='<p class="demo-context-label">See it in a phrase</p><div class="demo-phrase"><span lang="zh">下雨</span><p class="demo-pinyin">xià yǔ</p><p>to rain</p></div><button type="button" class="demo-listen" data-practice="listen">▶ Listen</button><p class="demo-local-note">Listen, then say it aloud.</p><button type="button" class="demo-primary" data-practice="recall">Try to recall →</button>';
