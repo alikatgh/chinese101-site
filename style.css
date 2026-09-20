@@ -45,3 +45,61 @@ body:not(.marketing)>main,body:not(.marketing)>nav,body:not(.marketing)>footer{m
 @media(max-width:1000px){.practice-layout{gap:45px}.lesson-sheet{padding:24px}.lesson-phrase{gap:13px}.lesson-phrase-note{font-size:14px;max-width:65px}}
 @media(max-width:760px){.practice-section{padding:65px 0 70px}.practice-layout{grid-template-columns:1fr;gap:45px;max-width:530px}.lesson-sheet{margin:0 7px;padding:23px}.lesson-picture{padding:28px 0 18px;gap:18px}.lesson-character>span[lang]{font-size:128px}.lesson-sheet figcaption{font-size:11px;padding-bottom:23px}.lesson-phrase-note{font-size:16px;max-width:90px}.practice-invitation{padding:0 7px}.practice-invitation>p:not(.eyebrow){max-width:440px}#practice-title{font-size:64px}.recall-note{margin-top:24px}}
 @media(max-width:380px){#characters-title{font-size:46px}.lesson-character>span[lang]{font-size:100px}.lesson-sheet{padding:20px}.lesson-picture{gap:10px}.lesson-phrase>span[lang]{font-size:40px}.lesson-phrase-note{max-width:65px;font-size:14px}}
+
+/* Marketing photography: quiet centers keep live text clear over the scenery. */
+.photo-hero,.photo-beta{position:relative;isolation:isolate}
+.section-photo{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+.section-photo img{display:block;width:100%;height:100%;object-fit:cover}
+.photo-hero:before,.photo-beta:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none}
+.photo-hero{padding-top:25px;padding-bottom:75px}
+.photo-hero .section-photo img{object-position:center 55%}
+.photo-hero:before{background:linear-gradient(180deg,#f6efe2 0%,#f6efe210 22%,#f6efe235 76%,#f6efe2 100%),linear-gradient(90deg,#f6efe208 0%,#f6efe2c9 30%,#f6efe2ed 50%,#f6efe2c9 70%,#f6efe208 100%)}
+.photo-hero .availability,.photo-hero .eyebrow{color:#514e3e}
+.photo-hero .button.secondary,.photo-hero .hero-motion-control{background:#fbf8f1e8}
+.photo-beta{padding-block:100px;margin-bottom:80px;overflow:hidden}
+.photo-beta:before{background:linear-gradient(90deg,#f6efe220,#f6efe2e8 32%,#f6efe2f5 50%,#f6efe2e8 68%,#f6efe220)}
+.beta-content>img{border-radius:18px;margin-bottom:26px}
+.photo-beta .beta-copy,.photo-beta .small-note{color:#505347}
+.photo-beta .beta-status{background:#fbf8f1cf;border-color:#b5a990}
+.blog-heading{display:grid;grid-template-columns:1.35fr 1fr;gap:44px;align-items:center}
+.blog-heading>div{min-width:0}
+.editorial .blog-heading h1{font-size:clamp(43px,4.7vw,64px)!important}
+.blog-heading-photo{display:block;width:100%;height:420px;object-fit:cover;border-radius:120px 120px 12px 12px;object-position:48% center}
+.photo-post{display:grid;grid-template-columns:1fr 1.2fr;padding:0;overflow:hidden}
+.post-photo{display:block;min-height:360px}
+.post-photo img{display:block;width:100%;height:100%;object-fit:cover}
+.post-copy{padding:34px 38px}
+.editorial .photo-post h2{font-size:34px!important}
+.article-photo{display:block;width:100%;height:auto;border-radius:12px;margin:32px 0 42px}
+@media(max-width:800px){
+ .blog-heading{grid-template-columns:1fr;gap:28px}
+ .blog-heading-photo{height:260px;border-radius:12px;object-position:center 55%}
+ .photo-post{grid-template-columns:1fr}
+ .post-photo{min-height:0;height:260px}
+ .post-copy{padding:24px 28px}
+ .photo-beta{margin-bottom:55px}
+}
+@media(max-width:640px){
+ .photo-hero{padding-top:10px;padding-bottom:48px}
+ .photo-hero .section-photo img{object-position:42% center}
+ .photo-hero:before{background:linear-gradient(180deg,#f6efe2c9 0%,#f6efe265 25%,#f6efe2d9 53%,#f6efe2f0 85%,#f6efe2 100%)}
+ .photo-beta{padding-block:60px 48px}
+ .photo-beta .section-photo img{object-position:23% center}
+ .photo-beta:before{background:#f6efe2df}
+ .photo-beta .section-lead br{display:none}
+ .post-copy{padding:22px 24px}
+ .editorial .photo-post h2{font-size:30px!important}
+ .blog-heading-photo,.post-photo{height:230px}
+}
+
+/* A quiet, real-time light study around the plan comparison. */
+.plans-section{position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 90% 15%,#b7c4a6 0,transparent 55%),#ebdec6}
+.plans-light{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.plans-light[hidden],.plans-motion-control[hidden]{display:none}
+.plans-heading{position:relative;padding-right:170px}
+.plans-motion-control{position:absolute;right:0;bottom:4px;display:inline-flex;align-items:center;gap:9px;padding:8px 13px;border:1px solid #8b927a;border-radius:22px;background:#fbf8f1c9;color:#414b39;font:12px/1.4 system-ui;cursor:pointer}
+.plans-motion-control:before{content:'Ⅱ';font-size:11px;line-height:1}
+.plans-motion-control[aria-pressed=true]:before{content:'▷'}
+.plans-motion-control:hover{background:#fffdf8}
+.plans-grid .plan{box-shadow:0 12px 35px #293a2510}
+@media(max-width:640px){.plans-heading{padding-right:0}.plans-motion-control{position:static;margin-top:22px}.plans-heading:has(.plans-motion-control:not([hidden]))+.plans-grid{margin-top:25px}}
