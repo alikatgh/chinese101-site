@@ -7,6 +7,33 @@
   let dataPromise;
   let activeAudio;
   const cleanups = new Set();
+  const motionPreference = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+  const motions = new Map();
+  let motionVisible = true;
+  function cancelMotion(scope) {
+    for (const [node, animation] of motions) {
+      if (!scope || node === scope || scope.contains(node)) {
+        motions.delete(node);
+        animation.cancel();
+      }
+    }
+  }
+  function enterMotion(node, direction=1, duration=160, axis='X') {
+    cancelMotion(node);
+    if (!motionVisible || document.hidden || !motionPreference || motionPreference.matches || typeof node.animate !== 'function') return;
+    const animation = node.animate([
+      {opacity:.7, transform:`translate${axis}(${direction * 6}px)`},
+      {opacity:1, transform:`translate${axis}(0)`}
+    ], {duration, easing:'cubic-bezier(.2,.7,.2,1)'});
+    motions.set(node, animation);
+    animation.onfinish = animation.oncancel = () => {
+      if (motions.get(node) === animation) motions.delete(node);
+    };
+  }
+  const motionChanged = () => { if (motionPreference.matches) cancelMotion(); };
+  if (motionPreference?.addEventListener) motionPreference.addEventListener('change', motionChanged);
+  else motionPreference?.addListener?.(motionChanged);
+  window.addEventListener('pageshow', () => { motionVisible = true; });
   function data() {
     if (!dataPromise) dataPromise = Promise.all(['characters','keys','strokes'].map(async name => {
       const response = await fetch(asset(name + '.json'));
@@ -63,7 +90,8 @@
     const body=frame(root,"Trazo a trazo");
     let mode='characters',page=0,query='',selection=null,strokeCleanup=()=>{};
     const searchable=Object.fromEntries(['characters','keys'].map(key=>[key,content[key].map(c=>({...c,search:norm([c.han,c.py,c.en,...(c.readings||[])].join(' '))}))]));
-    function results(){
+    function results(animate=false, direction=1){
+      cancelMotion(body);
       const matches=searchable[mode].filter(c=>c.search.includes(norm(query)));
       const total=Math.max(1,Math.ceil(matches.length/9));page=Math.min(page,total-1);
       const list=body.querySelector('.demo-char-grid');
@@ -72,19 +100,23 @@
       body.querySelector('.demo-page-count').textContent=`Página ${page+1} / ${total}`;
       body.querySelector('[data-library=prev]').disabled=page===0;
       body.querySelector('[data-library=next]').disabled=page===total-1;
+      if(animate)enterMotion(list,direction);
     }
-    function library(focus) {
+    function library(focus, direction=-1) {
+      cancelMotion(body);
       selection=null;strokeCleanup();
       body.innerHTML=`<label class="sr-only" for="${root.id}-search">Busca caracteres chinos por carácter, pinyin o significado</label><div class="demo-search"><input id="${root.id}-search" type="search" placeholder="Carácter, pinyin o significado" value="${esc(query)}" autocomplete="off" spellcheck="false"><button type="button" data-library="clear" aria-label="Borrar búsqueda de caracteres">×</button></div><div class="demo-segments" aria-label="Vista de biblioteca"><button type="button" data-library="characters" aria-pressed="${mode==='characters'}">Caracteres · 3.500</button><button type="button" data-library="keys" aria-pressed="${mode==='keys'}">Radicales · 101</button></div><p class="demo-result-count" role="status"></p><div class="demo-pager"><button type="button" data-library="prev" aria-label="Página anterior de caracteres">‹</button><span class="demo-page-count"></span><button type="button" data-library="next" aria-label="Página del siguiente carácter">›</button></div><div class="demo-char-grid"></div><p class="demo-local-note">Toca un carácter para explorarlo.</p>`;
       body.querySelector('input').addEventListener('input',event=>{query=event.target.value;page=0;results();});results();
-      if(focus)body.querySelector(`[data-library="${mode}"]`).focus();
+      if(focus){body.querySelector(`[data-library="${mode}"]`).focus();enterMotion(body,direction);}
     }
     function detail(han){
       selection=searchable[mode].find(c=>c.han===han);if(!selection)return;
+      cancelMotion(body);
       const c=selection;
       body.innerHTML=`<button type="button" class="demo-back" data-library="back">← Volver a ${labels[mode]}</button><h3 class="demo-han" lang="zh" tabindex="-1">${esc(c.han)}</h3><p class="demo-pinyin">${esc(c.py)}</p><p class="demo-definition">${esc(c.en)}</p>${c.strokes?`<p class="demo-local-note">${c.strokes} trazos</p>`:''}<div class="demo-stroke"></div><p class="demo-local-note">${content.strokes[c.han]?"Utiliza las flechas o reproduce la secuencia de trazos.":"Esta demostración web incluye guías de trazos para determinados caracteres."}</p>`;
       if(content.strokes[c.han])strokeCleanup=makeStroke(body.querySelector('.demo-stroke'),content.strokes[c.han].strokes,c.han);
       body.querySelector('h3').focus();body.scrollTop=0;
+      enterMotion(body);
     }
     const click=event=>{
       const tile=event.target.closest('[data-han]');if(tile){detail(tile.dataset.han);return;}
@@ -92,35 +124,37 @@
       if(!action)return;
       if(action==='back'){library(true);return;}
       if(action==='clear'){query='';page=0;body.querySelector('input').value='';results();body.querySelector('input').focus();return;}
-      if(action==='prev'||action==='next'){page+=action==='next'?1:-1;results();return;}
-      mode=action;page=0;library(true);
+      if(action==='prev'||action==='next'){const direction=action==='next'?1:-1;page+=direction;results(true,direction);return;}
+      mode=action;page=0;library(true,1);
     };
     body.addEventListener('click',click);library();
-    return()=>{strokeCleanup();body.removeEventListener('click',click);};
+    return()=>{cancelMotion(body);strokeCleanup();body.removeEventListener('click',click);};
   }
   function makePractice(root, start='context', memory=false){
     const body=frame(root,"Práctica diaria");let step=start,revealed=false,complete=false;
-    function render(focus=false){
+    function render(focus=false, animate=false){
+      cancelMotion(body);
       stopAudio();
-      if(complete){body.innerHTML="<div class=\"demo-complete\"><span lang=\"zh\">雨</span><h3>Un poco más familiar.</h3><p>Has completado este carácter de ejemplo.</p><p class=\"demo-local-note\">Esta demo no guarda ni sincroniza el progreso de la aplicación.</p><button type=\"button\" class=\"demo-primary\" data-practice=\"restart\">Inténtalo de nuevo</button></div>";return;}
+      if(complete){body.innerHTML="<div class=\"demo-complete\"><span lang=\"zh\">雨</span><h3>Un poco más familiar.</h3><p>Has completado este carácter de ejemplo.</p><p class=\"demo-local-note\">Esta demo no guarda ni sincroniza el progreso de la aplicación.</p><button type=\"button\" class=\"demo-primary\" data-practice=\"restart\">Inténtalo de nuevo</button></div>";if(animate)enterMotion(body.querySelector('.demo-complete'),1,180,'Y');return;}
       body.innerHTML=`<p class="demo-local-note">Un carácter de ejemplo · Lluvia</p><div class="demo-segments practice-tabs">${['discover','context','recall'].map((name,i)=>`<button type="button" data-practice="${name}" aria-pressed="${step===name}">${i+1} ${labels[name]}</button>`).join('')}</div><div class="practice-content"></div><p class="demo-audio-status" role="status"></p>`;
       const screen=body.querySelector('.practice-content');
       if(step==='discover')screen.innerHTML=`<div class="practice-glyph" lang="zh">雨</div><p class="demo-pinyin">yǔ</p><h3>lluvia</h3><details class="demo-memory" c101var0x><summary>Imagen para recordar</summary><img src="${asset('memory-rain.png')}" alt="Una nube de tinta con cuatro gotas de lluvia cayendo, una ilustración mnemotécnica para la lluvia" loading="lazy"><p>Una nube y unas gotas que caen. Una asociación visual para 雨.</p></details><button type="button" class="demo-primary" data-practice="context">Ver un ejemplo →</button>`;
       if(step==='context')screen.innerHTML="<p class=\"demo-context-label\">Verlo en una frase</p><div class=\"demo-phrase\"><span lang=\"zh\">下雨</span><p class=\"demo-pinyin\">xià yǔ</p><p>llover</p></div><button type=\"button\" class=\"demo-listen\" data-practice=\"listen\">▶ Escuchar</button><p class=\"demo-local-note\">Escucha y luego repítelo en voz alta.</p><button type=\"button\" class=\"demo-primary\" data-practice=\"recall\">Intenta recordar →</button>";
       if(step==='recall')screen.innerHTML=`<p class="demo-context-label">¿Qué significa este carácter?</p><div class="practice-glyph" lang="zh">雨</div>${revealed?"<p class=\"demo-pinyin\">yǔ</p><h3>lluvia</h3><p class=\"demo-local-note\">La memorización se evalúa de forma autónoma. No hay puntuación del habla.</p><button type=\"button\" class=\"demo-primary\" data-practice=\"done\">Me acordé de</button><button type=\"button\" class=\"demo-secondary\" data-practice=\"discover\">Muéstrame de nuevo</button>":"<button type=\"button\" class=\"demo-primary\" data-practice=\"reveal\">Mostrar significado</button>"}`;
       if(focus)body.querySelector(`[data-practice="${step}"]`).focus();
+      if(animate)enterMotion(screen,1,160,'Y');
     }
     const click=event=>{
       const button=event.target.closest('[data-practice]');if(!button)return;
       const action=button.dataset.practice;
       if(action==='listen'){sound('xiayu.m4a',button,body.querySelector('.demo-audio-status'));return;}
-      if(action==='done'){complete=true;render();body.querySelector('button').focus();return;}
+      if(action==='done'){complete=true;render(false,true);body.querySelector('button').focus();return;}
       if(action==='restart'){complete=false;step='discover';revealed=false;}
       else if(action==='reveal')revealed=true;
       else {step=action;revealed=false;}
-      render(true);
+      render(true,true);
     };
-    body.addEventListener('click',click);render();return()=>{stopAudio();body.removeEventListener('click',click);};
+    body.addEventListener('click',click);render();return()=>{cancelMotion(body);stopAudio();body.removeEventListener('click',click);};
   }
   const features={
     strokes:{title:"Sigue los trazos",description:"Observa cómo va tomando forma « 雨 », trazo a trazo. Esta guía en directo utiliza las mismas trayectorias de trazos que la aplicación.",steps:["Pulsa «Reproducir trazos» para seguir la secuencia.","Pausa, o avanza y retrocede con las flechas.","En la aplicación, abre la guía de trazos de un carácter para estudiar el orden de trazos disponible."],caption:"Guía web interactiva · Datos de trazos de la aplicación"},
@@ -133,13 +167,14 @@
   const dialog=document.getElementById('feature-dialog');let opener=null,destroy=()=>{},serial=0;
   async function openFeature(key,button){
     const info=features[key];if(!info)return;
-    opener=button;destroy();stopAudio();const request=++serial;
+    opener=button;cancelMotion(dialog);destroy();stopAudio();const request=++serial;
     document.getElementById('feature-dialog-title').textContent=info.title;
     document.getElementById('feature-dialog-description').textContent=info.description;
     document.getElementById('feature-dialog-steps').innerHTML=info.steps.map(s=>`<li>${esc(s)}</li>`).join('');
     document.getElementById('feature-dialog-caption').textContent=info.caption;
     const preview=document.getElementById('feature-dialog-preview');preview.innerHTML="<p class=\"demo-loading\">Cargando vista previa…</p>";
     dialog.showModal();document.documentElement.classList.add('feature-modal-open');
+    enterMotion(dialog,1,190,'Y');
     try{
       if(key==='progress'){preview.innerHTML="<img class=\"native-capture\" src=\"/assets/demo/progress.png\" alt=\"Chinese 101 Pantalla de progreso de Android que muestra la racha de aprendizaje, el historial semanal y los caracteres practicados\">";}
       else if(key==='comfort'){
@@ -153,6 +188,7 @@
         else destroy=makePractice(screen,key==='memory'?'discover':'context',key==='memory');
       }
       if(info.native){const details=document.createElement('details');details.className='native-comparison';details.innerHTML=`<summary>Ver la captura de pantalla de Android</summary><img class="native-capture" src="${info.native}" alt="Captura de pantalla original del desarrollo para Android de « Chinese 101 »" loading="lazy">`;preview.appendChild(details);}
+      enterMotion(preview,1,160,'Y');
       document.dispatchEvent(new CustomEvent('chinese101:demo',{detail:{feature:key}}));
     }catch(_){if(request===serial)preview.innerHTML="<p class=\"demo-loading\">No se ha podido cargar la vista previa. Cierra esta ventana e inténtalo de nuevo.</p>";}
   }
@@ -161,12 +197,12 @@
   let backdropDown=false;
   dialog.addEventListener('pointerdown',event=>{backdropDown=event.target===dialog;});
   dialog.addEventListener('click',event=>{if(event.target===dialog&&backdropDown){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();}backdropDown=false;});
-  dialog.addEventListener('close',()=>{serial++;destroy();destroy=()=>{};stopAudio();document.documentElement.classList.remove('feature-modal-open');opener?.focus();});
+  dialog.addEventListener('close',()=>{serial++;cancelMotion(dialog);destroy();destroy=()=>{};stopAudio();document.documentElement.classList.remove('feature-modal-open');opener?.focus();});
   async function initialize(root,type){
     try{const content=await data();type==='library'?makeLibrary(root,content):makePractice(root);}
     catch(_){root.innerHTML="<p class=\"demo-loading\">No se ha podido cargar esta demostración. <button type=\"button\">Inténtalo de nuevo</button></p>";root.querySelector('button').addEventListener('click',()=>initialize(root,type),{once:true});}
   }
   initialize(document.getElementById('library-demo'),'library');initialize(document.getElementById('practice-demo'),'practice');
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){stopAudio();document.querySelectorAll('[data-stroke=play]').forEach(button=>{if(button.textContent==="Pausa")button.click();});}});
-  window.addEventListener('pagehide',event=>{stopAudio();if(!event.persisted)cleanups.forEach(fn=>fn());});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelMotion();stopAudio();document.querySelectorAll('[data-stroke=play]').forEach(button=>{if(button.textContent==="Pausa")button.click();});}});
+  window.addEventListener('pagehide',event=>{motionVisible=false;cancelMotion();stopAudio();if(!event.persisted)cleanups.forEach(fn=>fn());});
 })();

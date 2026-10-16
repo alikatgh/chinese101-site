@@ -36,6 +36,12 @@
   const icon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || icons.arrow}</svg>`;
   const button = (action, label, className = '', attrs = '') => `<button type="button" class="np-button ${className}" data-action="${escape(action)}" ${attrs}>${label}</button>`;
   const pill = (action, label, selected, attrs = '') => button(action, escape(label), `np-pill${selected ? ' is-selected' : ''}`, `aria-pressed="${selected}" ${attrs}`);
+  const technicalDetails = (values = [], raw, context = '', extra = '') => {
+    const rows = values.filter(([, value]) => value !== undefined && value !== null && value !== '');
+    if (!rows.length && !raw && !extra) return '';
+    return `<details class="np-technical"><summary${context ? ` aria-label="Technical details for ${escape(context)}"` : ''}>Technical details</summary>${metadata(rows)}${extra}${raw ? `<pre class="np-technical-raw">${escape(JSON.stringify(raw, null, 2))}</pre>` : ''}</details>`;
+  };
+  const assetLink = (url, label) => /^\/assets\/native-preview\/licenses\/[A-Za-z0-9._-]+$/.test(String(url || '')) ? `<a href="${escape(url)}" target="_blank" rel="noopener noreferrer">${escape(label)}</a>` : '';
   const metadata = values => `<dl class="np-metadata">${values.filter(([, value]) => value !== undefined && value !== null && value !== '').map(([key, value]) => `<div><dt>${escape(key)}</dt><dd>${escape(Array.isArray(value) ? value.join(', ') : value)}</dd></div>`).join('')}</dl>`;
 
   function loadData(retry = false) {
@@ -103,6 +109,14 @@
       this.destroyed = false;
       this.loading = false;
       this.pointer = null;
+      this.shell = null;
+      this.contentMarkup = null;
+      this.modalMarkup = null;
+      this.renderedView = null;
+      this.motion = null;
+      this.motionPreference = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+      this.onMotionPreference = () => { if (this.motionPreference?.matches) this.cancelMotion(); };
+      this.motionPreference?.addEventListener?.('change', this.onMotionPreference);
       this.onClick = event => this.click(event);
       this.onInput = event => this.input(event);
       this.onKeydown = event => this.keydown(event);
@@ -171,9 +185,10 @@
       if (id && typeof id === 'object') return id;
       return this.sources.get(String(id || ''));
     }
-    sourceHTML(source, extra = []) {
-      if (!source) return `<p class="np-muted">No source record is included for this item in the preview selection.</p>${metadata(extra)}`;
-      return `<div class="np-source"><strong>${source.url ? link(source.url, source.name || source.id || 'Source') : escape(source.name || source.id || 'Source')}</strong>${source.attribution ? `<p>${escape(source.attribution)}</p>` : ''}${source.license ? `<p>${link(source.license_url || source.licenseUrl, source.license)}</p>` : ''}${metadata([...extra, ['Revision', source.revision], ['SHA-256', source.sha256 || source.dictionarySha256]])}</div>`;
+    sourceHTML(source, extra = [], record) {
+      if (!source) return `<p class="np-muted">No source record is included for this item in the preview selection.</p>${technicalDetails(extra, record)}`;
+      const name = source.name || source.id || 'Source';
+      return `<div class="np-source"><strong>${source.url ? link(source.url, name) : escape(name)}</strong>${source.attribution ? `<p>${escape(source.attribution)}</p>` : ''}${source.license ? `<p class="np-license">${link(source.license_url || source.licenseUrl, source.license)}</p>` : ''}${source.licenseFileUrl ? `<p>${assetLink(source.licenseFileUrl, 'Read bundled license')}</p>` : ''}${technicalDetails([...extra, ['Revision', source.revision], ['SHA-256', source.sha256 || source.dictionarySha256]], {source, ...(record ? {record} : {})}, name, assetLink(source.sourceArchiveUrl, 'Original source archive'))}</div>`;
     }
     characterSource(character = this.character()) {
       const source = this.source(character?.source);
@@ -187,11 +202,11 @@
     }
     characterSourceHTML(character = this.character()) {
       const formation = this.formation(character) || {};
-      const definition = this.sourceHTML(this.characterSource(character), [['Ordinal', character?.source?.ordinal], ['Strokes', character?.strokes]]);
+      const definition = this.sourceHTML(this.characterSource(character), [['Ordinal', character?.source?.ordinal], ['Strokes', character?.strokes]], character);
       const formationSource = this.sourceHTML(this.formationSource(character), [
         ['Record', formation.sourceRecordId || formation.source_record_id || character?.sourceRecordId || character?.source_record_id],
         ['Source line', formation.sourceLine], ['Record SHA-256', formation.sourceRecordSha256]
-      ]);
+      ], formation);
       return `<h4 class="np-source-heading">Character definition</h4>${definition}${this.formation(character) ? `<h4 class="np-source-heading">Formation record</h4>${formationSource}` : ''}`;
     }
 
@@ -220,7 +235,7 @@
       if (options.query !== undefined) this.query = options.query;
       if (options.cardId !== undefined) this.sentenceId = options.cardId;
       if (options.wordId !== undefined) { this.wordId = String(options.wordId); this.wordTab = 'definitions'; }
-      this.render({top: true, focusHeading: true});
+      this.render({top: true, focusHeading: true, motion: 'navigation'});
     }
     back() {
       if (this.modal) { this.closeModal(); return; }
@@ -229,7 +244,7 @@
       if (previous) {
         Object.assign(this, {view: previous.view, han: previous.han, wordId: previous.wordId, wordTab: previous.wordTab, query: previous.query, sentenceId: previous.sentenceId});
         if (previous.view === 'daily') this.restoreDaily(previous.han, previous.daily);
-        this.render({scroll: previous.scroll, focusHeading: true});
+        this.render({scroll: previous.scroll, focusHeading: true, motion: 'back'});
       } else this.navigate('daily');
     }
     resetQuick(hans) {
@@ -269,27 +284,93 @@
       this.render({top: true, focusHeading: true});
     }
 
+    mountShell() {
+      if (this.shell) return false;
+      this.host.innerHTML = `<div class="np-phone"><div class="np-screen"><div class="np-app">
+        <header class="np-header">${button('home', icon('home'), 'np-icon-button', 'data-shell-back aria-label="Go to Today"')}<h3 class="np-title" tabindex="-1">Chinese 101</h3>${button('theme', icon('moon'), 'np-icon-button', 'data-shell-theme aria-label="Use dark preview theme"')}</header>
+        <div class="np-content"><div class="np-view"></div></div>
+        <p class="np-announcement" data-announcement role="status" aria-live="polite"></p>
+        <nav class="np-bottom-nav" aria-label="Preview navigation">${[['daily','Today','today'], ['characters','Characters','characters'], ['profile','You','you']].map(([view, label, symbol]) => button('nav', `${icon(symbol)}<span>${label}</span>`, '', `data-view="${view}"`)).join('')}</nav>
+      </div><div class="np-overlay-root" data-open="false" aria-hidden="true" inert></div></div></div><p class="np-preview-caption">Interactive browser preview · selected content</p>`;
+      this.shell = {
+        app: this.host.querySelector('.np-app'),
+        content: this.host.querySelector('.np-content'),
+        view: this.host.querySelector('.np-view'),
+        title: this.host.querySelector('.np-title'),
+        back: this.host.querySelector('[data-shell-back]'),
+        theme: this.host.querySelector('[data-shell-theme]'),
+        navigation: Array.from(this.host.querySelectorAll('.np-bottom-nav [data-view]')),
+        overlay: this.host.querySelector('.np-overlay-root')
+      };
+      return true;
+    }
+    cancelMotion() {
+      this.motion?.cancel();
+      this.motion = null;
+    }
+    animateContent(target, kind = 'content') {
+      this.cancelMotion();
+      if (!target?.animate || this.motionPreference?.matches) return;
+      const transform = kind === 'back' ? 'translateX(-10px)' : kind === 'navigation' ? 'translateX(10px)' : kind === 'reveal' ? 'scale(.985)' : 'translateY(5px)';
+      this.motion = target.animate(
+        [{opacity: .35, transform}, {opacity: 1, transform: 'none'}],
+        {duration: 160, easing: 'cubic-bezier(.2,0,0,1)', fill: 'none'}
+      );
+    }
     render(options = {}) {
       if (this.destroyed) return;
       if (activeAudio?.owner === this) stopAudio();
-      const oldContent = this.host.querySelector('.np-content');
-      const scroll = options.top ? 0 : options.scroll ?? oldContent?.scrollTop ?? 0;
-      const focused = this.host.contains(document.activeElement) ? this.controlIdentity(document.activeElement) : null;
+      this.cancelSwipe();
+      this.cancelMotion();
+      const active = this.host.contains(document.activeElement) ? document.activeElement : null;
+      const focused = this.controlIdentity(active);
+      const persistentFocus = Boolean(active?.closest?.('.np-header, .np-bottom-nav'));
+      const initial = this.mountShell();
+      const {app, content, view, title, back, theme, navigation, overlay} = this.shell;
+      this.announce('');
+      const scroll = options.top ? 0 : options.scroll ?? content.scrollTop;
       const titles = {daily: 'Today', remember: 'Remember', components: 'Components', vocabulary: 'Vocabulary', word: 'Word details', quick: 'Quick test', sentence: 'In a sentence', characters: 'Characters', profile: 'You'};
       const nav = this.view === 'daily' ? 'daily' : ['profile', 'quick'].includes(this.view) ? 'profile' : 'characters';
       this.host.dataset.previewTheme = this.theme;
       this.host.dataset.previewView = this.view;
-      this.host.innerHTML = `<div class="np-phone"><div class="np-screen"><div class="np-app" ${this.modal ? 'inert' : ''}>
-        <header class="np-header">${button(this.history.length ? 'back' : 'home', icon(this.history.length ? 'back' : 'home'), 'np-icon-button', `aria-label="${this.history.length ? 'Back' : 'Go to Today'}"`)}<h3 class="np-title" tabindex="-1">${escape(titles[this.view] || 'Chinese 101')}</h3>${button('theme', icon(this.theme === 'light' ? 'moon' : 'sun'), 'np-icon-button', `aria-label="Use ${this.theme === 'light' ? 'dark' : 'light'} preview theme"`)}</header>
-        <div class="np-content">${this.content()}</div>
-        <p class="np-announcement" data-announcement role="status" aria-live="polite"></p>
-        <nav class="np-bottom-nav" aria-label="Preview navigation">${[['daily','Today','today'], ['characters','Characters','characters'], ['profile','You','you']].map(([view, label, symbol]) => button('nav', `${icon(symbol)}<span>${label}</span>`, nav === view ? 'is-current' : '', `data-view="${view}" ${nav === view ? 'aria-current="page"' : ''}`)).join('')}</nav>
-      </div>${this.modal ? this.modalHTML() : ''}</div></div><p class="np-preview-caption">Interactive browser preview · selected content</p>`;
-      const content = this.host.querySelector('.np-content');
-      if (content) content.scrollTop = scroll;
-      if (this.modal) this.host.querySelector('.np-dialog [data-action="close-modal"]')?.focus({preventScroll: true});
-      else if (options.focusHeading) this.host.querySelector('.np-title')?.focus({preventScroll: true});
-      else if (focused) this.findControl(focused)?.focus({preventScroll: true});
+      title.textContent = titles[this.view] || 'Chinese 101';
+      back.dataset.action = this.history.length ? 'back' : 'home';
+      back.setAttribute('aria-label', this.history.length ? 'Back' : 'Go to Today');
+      const backIcon = icon(this.history.length ? 'back' : 'home');
+      if (back.innerHTML !== backIcon) back.innerHTML = backIcon;
+      const themeIcon = icon(this.theme === 'light' ? 'moon' : 'sun');
+      if (theme.innerHTML !== themeIcon) theme.innerHTML = themeIcon;
+      theme.setAttribute('aria-label', `Use ${this.theme === 'light' ? 'dark' : 'light'} preview theme`);
+      for (const control of navigation) {
+        const current = control.dataset.view === nav;
+        control.classList.toggle('is-current', current);
+        if (current) control.setAttribute('aria-current', 'page');
+        else control.removeAttribute('aria-current');
+      }
+      const markup = this.content();
+      const contentChanged = markup !== this.contentMarkup;
+      if (contentChanged) {
+        view.innerHTML = markup;
+        this.contentMarkup = markup;
+        if (!initial) this.animateContent(view, options.motion || (this.renderedView !== this.view ? 'navigation' : 'content'));
+      }
+      content.scrollTop = scroll;
+      const wasModalOpen = overlay.dataset.open === 'true';
+      const modalKey = this.modal ? JSON.stringify({dialog: this.modal, character: this.han}) : null;
+      const modalChanged = modalKey !== this.modalMarkup;
+      if (this.modal && modalChanged) {
+        overlay.innerHTML = this.modalHTML();
+        this.modalMarkup = modalKey;
+        if (wasModalOpen) this.animateContent(overlay.querySelector('.np-dialog-content'));
+      }
+      app.inert = Boolean(this.modal);
+      overlay.inert = !this.modal;
+      overlay.setAttribute('aria-hidden', String(!this.modal));
+      overlay.dataset.open = String(Boolean(this.modal));
+      if (this.modal && (!wasModalOpen || modalChanged)) overlay.querySelector('[data-action="close-modal"]')?.focus({preventScroll: true});
+      else if (!this.modal && options.focusHeading && !persistentFocus) title.focus({preventScroll: true});
+      else if (!this.modal && !persistentFocus && focused && contentChanged) this.findControl(focused)?.focus({preventScroll: true});
+      this.renderedView = this.view;
     }
 
     content() {
@@ -329,7 +410,7 @@
     }
     contextHTML(card) {
       if (!card) return '<div class="np-empty"><h4>No context card in this selection</h4><p>Try another character from the selector.</p></div>';
-      return `<article class="np-context"><p class="np-kicker">From a bundled lesson</p><p class="np-sentence" lang="zh-Hans">${this.sentenceCharacters(card.zh)}</p>${card.pinyin ? `<p class="np-pinyin">${escape(card.pinyin)}</p>` : ''}${card.en ? `<p class="np-translation">${escape(card.en)}</p>` : ''}${this.audioHTML(card)}<p class="np-source-note">Lesson ${escape(card.sourceLessonId || '—')} · Card ${escape(card.sourceCardId || card.id)}</p><div class="np-context-links">${button('card-source', 'Card source', 'np-text-button', `data-card="${escape(card.id)}"`)}${this.view !== 'sentence' ? button('open-sentence', 'Character notes', 'np-text-button', `data-card="${escape(card.id)}"`) : ''}</div></article>`;
+      return `<article class="np-context"><p class="np-kicker">From a bundled lesson</p><p class="np-sentence" lang="zh-Hans">${this.sentenceCharacters(card.zh)}</p>${card.pinyin ? `<p class="np-pinyin">${escape(card.pinyin)}</p>` : ''}${card.en ? `<p class="np-translation">${escape(card.en)}</p>` : ''}${this.audioHTML(card)}<p class="np-source-note">${escape(this.source(card.source_id || card.sourceId || 'native-lessons')?.name || 'Bundled lesson')}</p><div class="np-context-links">${button('card-source', 'Card source', 'np-text-button', `data-card="${escape(card.id)}"`)}${this.view !== 'sentence' ? button('open-sentence', 'Character notes', 'np-text-button', `data-card="${escape(card.id)}"`) : ''}</div></article>`;
     }
     audioHTML(card) {
       return card?.audio ? button('audio', `${icon('sound')}<span data-audio-label>Listen</span>`, 'np-audio np-outline', `data-card="${escape(card.id)}" aria-label="Listen to sentence"`) : '<p class="np-muted np-recording-note">No audio recording in this selection.</p>';
@@ -363,7 +444,7 @@
       if (!formation) return '<p class="np-empty">No sourced formation record is included for this character.</p>';
       const etymology = formation.etymology || {};
       const tokens = this.componentLeaves(formation);
-      return `<section class="np-structure"><div class="np-structure-glyph" lang="zh-Hans">${escape(character.han)}</div>${formation.decomposition ? `<p class="np-decomposition" lang="zh-Hans">${escape(formation.decomposition)}</p>` : ''}${tokens.length ? `<p class="np-muted">Tap a sourced component to inspect it.</p><div class="np-component-tokens">${tokens.map(han => button('inspect', `<span lang="zh-Hans">${escape(han)}</span>`, 'np-component-token', `data-han="${escape(han)}" aria-label="Inspect component ${escape(han)}"`)).join('')}</div>` : ''}${metadata([['Radical', formation.radical], ['Type', etymology.type], ['Semantic', etymology.semantic], ['Phonetic', etymology.phonetic]])}${etymology.hint ? `<blockquote class="np-source-hint">${escape(etymology.hint)}</blockquote>` : ''}<p class="np-source-note">Source decomposition and notes; components are not an inferred stroke diagram.</p></section>`;
+      return `<section class="np-structure"><div class="np-structure-glyph" lang="zh-Hans">${escape(character.han)}</div>${tokens.length ? '<p class="np-kicker np-component-caption">Components</p>' : ''}${tokens.length ? `<p class="np-muted">Tap a sourced component to inspect it.</p><div class="np-component-tokens">${tokens.map(han => button('inspect', `<span lang="zh-Hans">${escape(han)}</span>`, 'np-component-token', `data-han="${escape(han)}" aria-label="Inspect component ${escape(han)}"`)).join('')}</div>` : ''}${metadata([['Radical', formation.radical], ['Type', etymology.type], ['Semantic', etymology.semantic], ['Phonetic', etymology.phonetic]])}${etymology.hint ? `<blockquote class="np-source-hint">${escape(etymology.hint)}</blockquote>` : ''}${technicalDetails([['Decomposition', formation.decomposition]], formation, 'character formation')}<p class="np-source-note">${escape(this.formationSource(character)?.name || 'Source record unavailable')}</p></section>`;
     }
     componentsHTML() {
       return `${this.characterPicker()}<div class="np-tabs" role="group" aria-label="Component view">${pill('component-tab', 'Structure', this.componentTab === 'structure', 'data-tab="structure"')}${pill('component-tab', 'Source', this.componentTab === 'source', 'data-tab="source"')}</div>${this.componentTab === 'structure' ? this.structureHTML() : `${this.formation()?.definition ? `<p class="np-source-definition">${escape(this.formation().definition)}</p>` : ''}${metadata([['Source pinyin', this.formation()?.pinyin]])}${this.characterSourceHTML()}`}<div class="np-stack">${button('open-remember', 'Picture & character', 'np-outline')}${button('open-vocabulary', 'Related vocabulary', 'np-outline')}</div>`;
@@ -391,9 +472,12 @@
       const examples = this.wordExamples(word);
       const exampleGap = examples.length < array(word.examples).length ? '<p class="np-muted">Some example records are unavailable in this preview selection.</p>' : '';
       let content;
-      if (this.wordTab === 'examples') content = `${exampleGap}${examples.length ? examples.map(example => `<article class="np-example">${example.zh ? `<p class="np-example-zh" lang="zh-Hans">${this.sentenceCharacters(example.zh)}</p>` : '<p class="np-muted">No Chinese text supplied for this example.</p>'}<p>${escape(example.en || 'No English text supplied for this example.')}</p><p class="np-source-note">${escape(example.attribution || 'No attribution supplied for this example.')}</p>${metadata([['Chinese record', example.zh_id], ['Chinese author', example.zh_author], ['English record', example.en_id], ['English author', example.en_author], ['Source', example.source_id]])}${!this.source(example.source_id) ? '<p class="np-source-note">No source record supplied for this example.</p>' : ''}</article>`).join('') : '<p class="np-empty">No attributable examples are included for this word in the preview selection.</p>'}`;
-      else if (this.wordTab === 'sources') content = `${this.sourceHTML(this.source(word.source_id), [['Source record', word.source_record_id]])}${examples.map(example => this.source(example.source_id)).filter((source, index, sources) => source && sources.indexOf(source) === index).map(source => this.sourceHTML(source)).join('')}${exampleGap}${examples.some(example => !this.source(example.source_id)) ? '<p class="np-muted">No source record is supplied for one or more examples.</p>' : ''}`;
-      else content = `${word.traditional && word.traditional !== word.simplified ? `<p class="np-muted">Traditional: <span lang="zh-Hant">${escape(word.traditional)}</span></p>` : ''}${this.wordDefinitions(word).length ? `<ol class="np-definitions">${this.wordDefinitions(word).map(definition => `<li>${escape(definition)}</li>`).join('')}</ol>` : '<p class="np-empty">No definition is included in the supplied record.</p>'}<p class="np-source-note">${escape(word.source_id || '')} · ${escape(word.source_record_id || '')}</p>`;
+      if (this.wordTab === 'examples') content = `${exampleGap}${examples.length ? examples.map(example => {
+        const source = this.source(example.source_id);
+        return `<article class="np-example">${example.zh ? `<p class="np-example-zh" lang="zh-Hans">${this.sentenceCharacters(example.zh)}</p>` : '<p class="np-muted">No Chinese text supplied for this example.</p>'}<p>${escape(example.en || 'No English text supplied for this example.')}</p><p class="np-example-authors">${example.zh_author ? `Chinese: ${escape(example.zh_author)}` : 'Chinese author not supplied'}<br>${example.en_author ? `English: ${escape(example.en_author)}` : 'English author not supplied'}</p>${source ? `<p class="np-source-note">${link(source.url, source.name || source.id)}${source.license ? ` · ${link(source.license_url || source.licenseUrl, source.license)}` : ''}</p>` : '<p class="np-source-note">No source record supplied for this example.</p>'}${!example.attribution ? '<p class="np-source-note">No attribution supplied for this example.</p>' : ''}${technicalDetails([['Chinese record', example.zh_id], ['English record', example.en_id], ['Source', example.source_id], ['Attribution', example.attribution]], example, 'sentence example')}</article>`;
+      }).join('') : '<p class="np-empty">No attributable examples are included for this word in the preview selection.</p>'}`;
+      else if (this.wordTab === 'sources') content = `${this.sourceHTML(this.source(word.source_id), [['Source record', word.source_record_id]], word)}${examples.map(example => this.source(example.source_id)).filter((source, index, sources) => source && sources.indexOf(source) === index).map(source => this.sourceHTML(source)).join('')}${exampleGap}${examples.some(example => !this.source(example.source_id)) ? '<p class="np-muted">No source record is supplied for one or more examples.</p>' : ''}`;
+      else content = `${word.traditional && word.traditional !== word.simplified ? `<p class="np-muted">Traditional: <span lang="zh-Hant">${escape(word.traditional)}</span></p>` : ''}${this.wordDefinitions(word).length ? `<ol class="np-definitions">${this.wordDefinitions(word).map(definition => `<li>${escape(definition)}</li>`).join('')}</ol>` : '<p class="np-empty">No definition is included in the supplied record.</p>'}<p class="np-source-note">${escape(this.source(word.source_id)?.name || 'Source record unavailable')}</p>`;
       return `<div class="np-word-detail-heading"><span lang="zh-Hans">${escape(word.simplified)}</span>${word.pinyin_display ? `<p class="np-pinyin">${escape(word.pinyin_display)}</p>` : '<p class="np-muted">No reading supplied in this source record.</p>'}</div><div class="np-tabs np-word-tabs" role="group" aria-label="Word details">${pill('word-tab', 'Meaning', this.wordTab === 'definitions', 'data-tab="definitions"')}${pill('word-tab', `Examples (${examples.length})`, this.wordTab === 'examples', 'data-tab="examples"')}${pill('word-tab', 'Sources', this.wordTab === 'sources', 'data-tab="sources"')}</div>${content}`;
     }
     quickHTML() {
@@ -432,7 +516,7 @@
     }
     findControl(identity) {
       if (identity.characterPicker !== undefined) return this.host.querySelector('[data-character-picker]');
-      return Array.from(this.host.querySelectorAll('[data-action]')).find(element => Object.entries(identity).every(([key, value]) => element.dataset[key] === value));
+      return Array.from(this.host.querySelectorAll('[data-action]')).find(element => !element.closest('[inert]') && Object.entries(identity).every(([key, value]) => element.dataset[key] === value));
     }
     openModal(kind, options = {}, trigger) {
       if (!this.modal) this.restoreControl = this.controlIdentity(trigger || document.activeElement);
@@ -454,20 +538,20 @@
         const character = this.characters.get(modal.han);
         content = `<div class="np-expanded-glyph" lang="zh-Hans">${escape(modal.han)}</div>${this.meaningHTML(character)}${this.characterSourceHTML(character)}`;
       } else if (modal.kind === 'inspect') {
-        title = `Inspect ${modal.han}`;
+        title = `Character ${modal.han}`;
         const character = this.characters.get(modal.han);
-        content = `<div class="np-inspect-glyph" lang="zh-Hans">${escape(modal.han)}</div>${character ? `${this.meaningHTML(character)}${this.structureHTML(character)}${button('inspect-remember', 'Open Picture & character', 'np-primary np-wide', `data-han="${escape(modal.han)}"`)}${this.characterSourceHTML(character)}` : '<p>No sourced character record is included for this glyph in the preview selection.</p>'}${button('inspect-vocabulary', 'Find in preview vocabulary', 'np-outline np-wide', `data-han="${escape(modal.han)}"`)}`;
+        content = `<div class="np-inspect-glyph" lang="zh-Hans">${escape(modal.han)}</div>${character ? this.meaningHTML(character) : '<p>No sourced character record is included for this glyph in the preview selection.</p>'}<div class="np-inspect-actions">${character ? button('inspect-remember', 'Open Picture & character', 'np-primary np-wide', `data-han="${escape(modal.han)}"`) : ''}${button('inspect-vocabulary', 'Find in preview vocabulary', 'np-outline np-wide', `data-han="${escape(modal.han)}"`)}</div>${character ? `${this.structureHTML(character)}${this.characterSourceHTML(character)}` : ''}`;
       } else if (modal.kind === 'picture-credits') {
         title = 'Picture & character credits';
         const character = this.character();
         const picture = character?.picture || {};
         const recipe = picture.originalPictureRecipe || picture;
         const objects = this.pictureLayers(character).map(layer => layer.object).filter((object, index, all) => all.indexOf(object) === index);
-        content = `${objects.length ? `<h4>Picture objects</h4>${objects.map(object => `<article class="np-source"><strong>${escape(object.annotation || object.id)}</strong>${metadata([['Object', object.id], ['Author', object.author], ['Source file', object.sourceFile], ['SHA-256', object.sha256]])}${object.sourceUrl ? `<p>${link(object.sourceUrl, 'Original source')}</p>` : ''}${object.license ? `<p>${link(object.licenseUrl, object.license)}</p>` : ''}</article>`).join('')}${metadata([['Recipe', recipe.id], ['Dictionary source', recipe.dictionarySourceId], ['Source record', recipe.sourceRecordId], ['Source pinyin', recipe.sourcePinyin], ['Source definitions', recipe.sourceDefinitions]])}${recipe.dictionarySourceId ? this.sourceHTML(this.source(recipe.dictionarySourceId)) : ''}` : '<p>No picture objects are included for this character.</p>'}${this.characterSourceHTML(character)}`;
+        content = `${objects.length ? `<h4>Picture objects</h4>${objects.map(object => `<article class="np-source"><strong>${escape(object.annotation || object.id)}</strong>${object.author ? `<p class="np-artist">Artwork by ${escape(object.author)}</p>` : '<p class="np-muted">No artist attribution supplied.</p>'}${object.sourceUrl ? `<p>${link(object.sourceUrl, 'Original artwork')}</p>` : ''}${object.license ? `<p class="np-license">${link(object.licenseUrl, object.license)}</p>` : ''}${technicalDetails([['Object', object.id], ['Source file', object.sourceFile], ['SHA-256', object.sha256]], object, object.annotation || object.id)}</article>`).join('')}${recipe.dictionarySourceId ? this.sourceHTML(this.source(recipe.dictionarySourceId), [['Recipe', recipe.id], ['Source record', recipe.sourceRecordId]], recipe) : technicalDetails([], recipe, 'picture recipe')}` : '<p>No picture objects are included for this character.</p>'}${this.characterSourceHTML(character)}`;
       } else if (modal.kind === 'card-source') {
         title = 'Lesson card source';
         const card = this.cards.get(String(modal.card));
-        content = card ? `${this.sourceHTML(this.source(card.source_id || card.sourceId || 'native-lessons'), [['Lesson', card.sourceLessonId], ['Card', card.sourceCardId || card.id], ['Preview record', card.id], ['Catalog SHA-256', card.sourceCatalogSha256], ['Audio SHA-256', card.audioSha256]])}` : '<p>This card is not included in the preview selection.</p>';
+        content = card ? `${this.sourceHTML(this.source(card.source_id || card.sourceId || 'native-lessons'), [['Lesson', card.sourceLessonId], ['Card', card.sourceCardId || card.id], ['Preview record', card.id], ['Catalog SHA-256', card.sourceCatalogSha256], ['Audio SHA-256', card.audioSha256]], card)}` : '<p>This card is not included in the preview selection.</p>';
       } else content = this.data.sources.length ? this.data.sources.map(source => this.sourceHTML(source)).join('') : '<p>No source records are included in this selection.</p>';
       return `<div class="np-modal-backdrop"><section class="np-dialog" role="dialog" aria-modal="true" aria-labelledby="${this.id}-dialog-title"><header><h4 id="${this.id}-dialog-title">${escape(title)}</h4>${button('close-modal', icon('close'), 'np-icon-button', 'aria-label="Close dialog"')}</header><div class="np-dialog-content">${content}</div></section></div>`;
     }
@@ -485,7 +569,7 @@
         case 'theme': this.theme = this.theme === 'light' ? 'dark' : 'light'; this.render(); break;
         case 'daily-step': this.dailyStep = number(control.dataset.step, 0, 0, 2); this.render({top: true}); break;
         case 'next-character': this.nextCharacter(); break;
-        case 'daily-reveal': this.dailyRevealed = true; this.render(); this.host.querySelector('[data-action="daily-grade"]')?.focus({preventScroll: true}); break;
+        case 'daily-reveal': this.dailyRevealed = true; this.render({motion: 'reveal'}); this.host.querySelector('[data-action="daily-grade"]')?.focus({preventScroll: true}); break;
         case 'daily-grade':
           if (!this.dailyRevealed || this.dailyResult) break;
           this.dailyResult = {han: this.han, known: control.dataset.known === 'true'};
@@ -505,7 +589,7 @@
         case 'character': this.navigate('remember', {han: control.dataset.han}); break;
         case 'quick-reveal':
           if (control.dataset.turn !== this.turn() || this.quick.revealed) break;
-          this.quick.revealed = true; this.render(); this.host.querySelector('[data-action="quick-grade"]')?.focus({preventScroll: true}); break;
+          this.quick.revealed = true; this.render({motion: 'reveal'}); this.host.querySelector('[data-action="quick-grade"]')?.focus({preventScroll: true}); break;
         case 'quick-grade': this.gradeQuick(control.dataset.known === 'true', control.dataset.turn); break;
         case 'quick-retry-missed': this.resetQuick(this.quick.grades.filter(grade => !grade.known).map(grade => grade.han)); this.render({top: true, focusHeading: true}); break;
         case 'quick-repeat': this.resetQuick([...this.quick.queue]); this.render({top: true, focusHeading: true}); break;
@@ -533,12 +617,13 @@
       const count = this.host.querySelector('[data-word-count]');
       if (list) list.innerHTML = this.wordListHTML();
       if (count) count.textContent = `${this.filteredWords().length} of ${this.words.size} supplied words`;
+      this.contentMarkup = this.content();
     }
     keydown(event) {
       if (!this.modal) return;
       if (event.key === 'Escape') { event.preventDefault(); this.closeModal(); return; }
       if (event.key !== 'Tab') return;
-      const controls = Array.from(this.host.querySelectorAll('.np-dialog button, .np-dialog a[href], .np-dialog input, .np-dialog select')).filter(control => !control.disabled && !control.hidden);
+      const controls = Array.from(this.host.querySelectorAll('.np-dialog button, .np-dialog a[href], .np-dialog summary, .np-dialog input, .np-dialog select')).filter(control => !control.disabled && !control.hidden && (!control.getClientRects || control.getClientRects().length > 0));
       if (!controls.length) return;
       const first = controls[0];
       const last = controls[controls.length - 1];
@@ -617,6 +702,8 @@
     }
     destroy() {
       this.destroyed = true;
+      this.cancelMotion();
+      this.motionPreference?.removeEventListener?.('change', this.onMotionPreference);
       if (activeAudio?.owner === this) stopAudio();
       this.cancelSwipe();
       this.host.removeEventListener('click', this.onClick);

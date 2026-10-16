@@ -7,6 +7,33 @@
   let dataPromise;
   let activeAudio;
   const cleanups = new Set();
+  const motionPreference = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+  const motions = new Map();
+  let motionVisible = true;
+  function cancelMotion(scope) {
+    for (const [node, animation] of motions) {
+      if (!scope || node === scope || scope.contains(node)) {
+        motions.delete(node);
+        animation.cancel();
+      }
+    }
+  }
+  function enterMotion(node, direction=1, duration=160, axis='X') {
+    cancelMotion(node);
+    if (!motionVisible || document.hidden || !motionPreference || motionPreference.matches || typeof node.animate !== 'function') return;
+    const animation = node.animate([
+      {opacity:.7, transform:`translate${axis}(${direction * 6}px)`},
+      {opacity:1, transform:`translate${axis}(0)`}
+    ], {duration, easing:'cubic-bezier(.2,.7,.2,1)'});
+    motions.set(node, animation);
+    animation.onfinish = animation.oncancel = () => {
+      if (motions.get(node) === animation) motions.delete(node);
+    };
+  }
+  const motionChanged = () => { if (motionPreference.matches) cancelMotion(); };
+  if (motionPreference?.addEventListener) motionPreference.addEventListener('change', motionChanged);
+  else motionPreference?.addListener?.(motionChanged);
+  window.addEventListener('pageshow', () => { motionVisible = true; });
   function data() {
     if (!dataPromise) dataPromise = Promise.all(['characters','keys','strokes'].map(async name => {
       const response = await fetch(asset(name + '.json'));
@@ -63,7 +90,8 @@
     const body=frame(root,'Shape by shape');
     let mode='characters',page=0,query='',selection=null,strokeCleanup=()=>{};
     const searchable=Object.fromEntries(['characters','keys'].map(key=>[key,content[key].map(c=>({...c,search:norm([c.han,c.py,c.en,...(c.readings||[])].join(' '))}))]));
-    function results(){
+    function results(animate=false, direction=1){
+      cancelMotion(body);
       const matches=searchable[mode].filter(c=>c.search.includes(norm(query)));
       const total=Math.max(1,Math.ceil(matches.length/9));page=Math.min(page,total-1);
       const list=body.querySelector('.demo-char-grid');
@@ -72,19 +100,23 @@
       body.querySelector('.demo-page-count').textContent=`Page ${page+1} / ${total}`;
       body.querySelector('[data-library=prev]').disabled=page===0;
       body.querySelector('[data-library=next]').disabled=page===total-1;
+      if(animate)enterMotion(list,direction);
     }
-    function library(focus) {
+    function library(focus, direction=-1) {
+      cancelMotion(body);
       selection=null;strokeCleanup();
       body.innerHTML=`<label class="sr-only" for="${root.id}-search">Search Chinese characters by character, pinyin or meaning</label><div class="demo-search"><input id="${root.id}-search" type="search" placeholder="Character, pinyin or meaning" value="${esc(query)}" autocomplete="off" spellcheck="false"><button type="button" data-library="clear" aria-label="Clear character search">×</button></div><div class="demo-segments" aria-label="Library view"><button type="button" data-library="characters" aria-pressed="${mode==='characters'}">Characters · 3,500</button><button type="button" data-library="keys" aria-pressed="${mode==='keys'}">Keys · 101</button></div><p class="demo-result-count" role="status"></p><div class="demo-pager"><button type="button" data-library="prev" aria-label="Previous character page">‹</button><span class="demo-page-count"></span><button type="button" data-library="next" aria-label="Next character page">›</button></div><div class="demo-char-grid"></div><p class="demo-local-note">Tap a character to explore it.</p>`;
       body.querySelector('input').addEventListener('input',event=>{query=event.target.value;page=0;results();});results();
-      if(focus)body.querySelector(`[data-library="${mode}"]`).focus();
+      if(focus){body.querySelector(`[data-library="${mode}"]`).focus();enterMotion(body,direction);}
     }
     function detail(han){
       selection=searchable[mode].find(c=>c.han===han);if(!selection)return;
+      cancelMotion(body);
       const c=selection;
       body.innerHTML=`<button type="button" class="demo-back" data-library="back">← Back to ${labels[mode]}</button><h3 class="demo-han" lang="zh" tabindex="-1">${esc(c.han)}</h3><p class="demo-pinyin">${esc(c.py)}</p><p class="demo-definition">${esc(c.en)}</p>${c.strokes?`<p class="demo-local-note">${c.strokes} strokes</p>`:''}<div class="demo-stroke"></div><p class="demo-local-note">${content.strokes[c.han]?'Use the arrows or play the stroke sequence.':'This web demo includes stroke guides for selected characters.'}</p>`;
       if(content.strokes[c.han])strokeCleanup=makeStroke(body.querySelector('.demo-stroke'),content.strokes[c.han].strokes,c.han);
       body.querySelector('h3').focus();body.scrollTop=0;
+      enterMotion(body);
     }
     const click=event=>{
       const tile=event.target.closest('[data-han]');if(tile){detail(tile.dataset.han);return;}
@@ -92,35 +124,37 @@
       if(!action)return;
       if(action==='back'){library(true);return;}
       if(action==='clear'){query='';page=0;body.querySelector('input').value='';results();body.querySelector('input').focus();return;}
-      if(action==='prev'||action==='next'){page+=action==='next'?1:-1;results();return;}
-      mode=action;page=0;library(true);
+      if(action==='prev'||action==='next'){const direction=action==='next'?1:-1;page+=direction;results(true,direction);return;}
+      mode=action;page=0;library(true,1);
     };
     body.addEventListener('click',click);library();
-    return()=>{strokeCleanup();body.removeEventListener('click',click);};
+    return()=>{cancelMotion(body);strokeCleanup();body.removeEventListener('click',click);};
   }
   function makePractice(root, start='context', memory=false){
     const body=frame(root,'Daily practice');let step=start,revealed=false,complete=false;
-    function render(focus=false){
+    function render(focus=false, animate=false){
+      cancelMotion(body);
       stopAudio();
-      if(complete){body.innerHTML='<div class="demo-complete"><span lang="zh">雨</span><h3>A little more familiar.</h3><p>You finished this sample character.</p><p class="demo-local-note">This demo does not save or sync app progress.</p><button type="button" class="demo-primary" data-practice="restart">Try again</button></div>';return;}
+      if(complete){body.innerHTML='<div class="demo-complete"><span lang="zh">雨</span><h3>A little more familiar.</h3><p>You finished this sample character.</p><p class="demo-local-note">This demo does not save or sync app progress.</p><button type="button" class="demo-primary" data-practice="restart">Try again</button></div>';if(animate)enterMotion(body.querySelector('.demo-complete'),1,180,'Y');return;}
       body.innerHTML=`<p class="demo-local-note">One sample character · Rain</p><div class="demo-segments practice-tabs">${['discover','context','recall'].map((name,i)=>`<button type="button" data-practice="${name}" aria-pressed="${step===name}">${i+1} ${labels[name]}</button>`).join('')}</div><div class="practice-content"></div><p class="demo-audio-status" role="status"></p>`;
       const screen=body.querySelector('.practice-content');
       if(step==='discover')screen.innerHTML=`<div class="practice-glyph" lang="zh">雨</div><p class="demo-pinyin">yǔ</p><h3>rain</h3><details class="demo-memory" ${memory?'open':''}><summary>Memory picture</summary><img src="${asset('memory-rain.png')}" alt="An ink cloud with four falling raindrops, a memory illustration for rain" loading="lazy"><p>A cloud and falling drops. A visual association for 雨.</p></details><button type="button" class="demo-primary" data-practice="context">See an example →</button>`;
       if(step==='context')screen.innerHTML='<p class="demo-context-label">See it in a phrase</p><div class="demo-phrase"><span lang="zh">下雨</span><p class="demo-pinyin">xià yǔ</p><p>to rain</p></div><button type="button" class="demo-listen" data-practice="listen">▶ Listen</button><p class="demo-local-note">Listen, then say it aloud.</p><button type="button" class="demo-primary" data-practice="recall">Try to recall →</button>';
       if(step==='recall')screen.innerHTML=`<p class="demo-context-label">What does this character mean?</p><div class="practice-glyph" lang="zh">雨</div>${revealed?'<p class="demo-pinyin">yǔ</p><h3>rain</h3><p class="demo-local-note">Recall is self-assessed. There’s no speech scoring.</p><button type="button" class="demo-primary" data-practice="done">I remembered</button><button type="button" class="demo-secondary" data-practice="discover">Show me again</button>':'<button type="button" class="demo-primary" data-practice="reveal">Reveal meaning</button>'}`;
       if(focus)body.querySelector(`[data-practice="${step}"]`).focus();
+      if(animate)enterMotion(screen,1,160,'Y');
     }
     const click=event=>{
       const button=event.target.closest('[data-practice]');if(!button)return;
       const action=button.dataset.practice;
       if(action==='listen'){sound('xiayu.m4a',button,body.querySelector('.demo-audio-status'));return;}
-      if(action==='done'){complete=true;render();body.querySelector('button').focus();return;}
+      if(action==='done'){complete=true;render(false,true);body.querySelector('button').focus();return;}
       if(action==='restart'){complete=false;step='discover';revealed=false;}
       else if(action==='reveal')revealed=true;
       else {step=action;revealed=false;}
-      render(true);
+      render(true,true);
     };
-    body.addEventListener('click',click);render();return()=>{stopAudio();body.removeEventListener('click',click);};
+    body.addEventListener('click',click);render();return()=>{cancelMotion(body);stopAudio();body.removeEventListener('click',click);};
   }
   const features={
     strokes:{title:'Follow the strokes',description:'Watch 雨 take shape, one stroke at a time. This live guide uses the same stroke paths as the app.',steps:['Press Play strokes to follow the sequence.','Pause, or move forward and back with the arrows.','In the app, open a character’s stroke guide to study available stroke order.'],caption:'Interactive web guide · App stroke data'},
@@ -133,13 +167,14 @@
   const dialog=document.getElementById('feature-dialog');let opener=null,destroy=()=>{},serial=0;
   async function openFeature(key,button){
     const info=features[key];if(!info)return;
-    opener=button;destroy();stopAudio();const request=++serial;
+    opener=button;cancelMotion(dialog);destroy();stopAudio();const request=++serial;
     document.getElementById('feature-dialog-title').textContent=info.title;
     document.getElementById('feature-dialog-description').textContent=info.description;
     document.getElementById('feature-dialog-steps').innerHTML=info.steps.map(s=>`<li>${esc(s)}</li>`).join('');
     document.getElementById('feature-dialog-caption').textContent=info.caption;
     const preview=document.getElementById('feature-dialog-preview');preview.innerHTML='<p class="demo-loading">Loading preview…</p>';
     dialog.showModal();document.documentElement.classList.add('feature-modal-open');
+    enterMotion(dialog,1,190,'Y');
     try{
       if(key==='progress'){preview.innerHTML='<img class="native-capture" src="/assets/demo/progress.png" alt="Chinese 101 Android progress screen showing a learning streak, weekly history and practised characters">';}
       else if(key==='comfort'){
@@ -153,6 +188,7 @@
         else destroy=makePractice(screen,key==='memory'?'discover':'context',key==='memory');
       }
       if(info.native){const details=document.createElement('details');details.className='native-comparison';details.innerHTML=`<summary>See the Android screenshot</summary><img class="native-capture" src="${info.native}" alt="Original Chinese 101 Android development screenshot" loading="lazy">`;preview.appendChild(details);}
+      enterMotion(preview,1,160,'Y');
       document.dispatchEvent(new CustomEvent('chinese101:demo',{detail:{feature:key}}));
     }catch(_){if(request===serial)preview.innerHTML='<p class="demo-loading">The preview could not load. Close this window and try again.</p>';}
   }
@@ -161,12 +197,12 @@
   let backdropDown=false;
   dialog.addEventListener('pointerdown',event=>{backdropDown=event.target===dialog;});
   dialog.addEventListener('click',event=>{if(event.target===dialog&&backdropDown){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();}backdropDown=false;});
-  dialog.addEventListener('close',()=>{serial++;destroy();destroy=()=>{};stopAudio();document.documentElement.classList.remove('feature-modal-open');opener?.focus();});
+  dialog.addEventListener('close',()=>{serial++;cancelMotion(dialog);destroy();destroy=()=>{};stopAudio();document.documentElement.classList.remove('feature-modal-open');opener?.focus();});
   async function initialize(root,type){
     try{const content=await data();type==='library'?makeLibrary(root,content):makePractice(root);}
     catch(_){root.innerHTML='<p class="demo-loading">Couldn’t load this demo. <button type="button">Try again</button></p>';root.querySelector('button').addEventListener('click',()=>initialize(root,type),{once:true});}
   }
   initialize(document.getElementById('library-demo'),'library');initialize(document.getElementById('practice-demo'),'practice');
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){stopAudio();document.querySelectorAll('[data-stroke=play]').forEach(button=>{if(button.textContent==='Pause')button.click();});}});
-  window.addEventListener('pagehide',event=>{stopAudio();if(!event.persisted)cleanups.forEach(fn=>fn());});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelMotion();stopAudio();document.querySelectorAll('[data-stroke=play]').forEach(button=>{if(button.textContent==='Pause')button.click();});}});
+  window.addEventListener('pagehide',event=>{motionVisible=false;cancelMotion();stopAudio();if(!event.persisted)cleanups.forEach(fn=>fn());});
 })();
