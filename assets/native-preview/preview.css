@@ -1,0 +1,175 @@
+/* Scoped native-style UI. Every control is HTML; no screenshot hit targets. */
+.native-preview{--np-bg:#f8f4eb;--np-surface:#fffdf8;--np-text:#302e2b;--np-muted:#756d63;--np-line:#dfd5c7;--np-accent:#a33515;--np-soft:#f3e4d8;--np-contrast:#fffaf3;display:block;width:min(100%,330px);margin-inline:auto;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--np-text);text-align:left;isolation:isolate;box-sizing:border-box}
+.native-preview[data-preview-theme=dark]{--np-bg:#252421;--np-surface:#302e29;--np-text:#f5eee1;--np-muted:#c0b5a4;--np-line:#555045;--np-accent:#efaa88;--np-soft:#47372e;--np-contrast:#28231f}
+.native-preview *,.native-preview *:before,.native-preview *:after{box-sizing:border-box}
+.native-preview .np-phone{width:100%;border:7px solid #302e2b;border-radius:31px;background:#302e2b;box-shadow:0 15px 30px #302e2b16;overflow:hidden}
+.native-preview .np-screen{position:relative;border-radius:23px;background:var(--np-bg);overflow:hidden;min-width:0}
+.native-preview .np-app{display:flex;flex-direction:column;min-height:596px;height:650px;max-height:75vh}
+.native-preview .np-header{display:flex;align-items:center;gap:5px;min-height:66px;padding:8px 8px 5px;background:var(--np-bg);border-bottom:1px solid var(--np-line);flex-shrink:0}
+.native-preview .np-title{font:600 20px/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:-.025em;margin:0;flex:1;color:var(--np-text);outline-offset:4px}
+.native-preview .np-content{overflow-y:auto;overscroll-behavior-y:contain;scrollbar-width:thin;flex:1;min-height:0;padding:19px 17px 22px;scroll-behavior:smooth}
+.native-preview p,.native-preview h4,.native-preview blockquote,.native-preview ol,.native-preview dl{margin:0}
+.native-preview h4{font-size:17px;line-height:1.3;font-weight:650;letter-spacing:-.02em}
+.native-preview p+p{margin-top:8px}
+.native-preview svg{width:21px;height:21px;display:block;flex-shrink:0}
+.native-preview button,.native-preview input,.native-preview select{font:inherit;color:inherit}
+.native-preview button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.native-preview button:focus-visible,.native-preview input:focus-visible,.native-preview select:focus-visible,.native-preview a:focus-visible{outline:3px solid var(--np-accent);outline-offset:3px}
+.native-preview button:disabled{cursor:default}
+.native-preview a{color:var(--np-accent);text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.native-preview .np-button{display:inline-flex;justify-content:center;align-items:center;gap:8px;min-height:44px;padding:10px 13px;border:0;border-radius:11px;background:transparent;font-size:13px;line-height:1.4;font-weight:600;text-align:center;max-width:100%}
+.native-preview .np-button:active{filter:brightness(.94)}
+.native-preview .np-primary{background:var(--np-accent);color:var(--np-contrast)}
+.native-preview .np-outline{border:1px solid var(--np-line);background:var(--np-surface);color:var(--np-text)}
+.native-preview .np-icon-button{width:44px;height:44px;padding:10px;flex-shrink:0;border-radius:50%;color:var(--np-text)}
+.native-preview .np-icon-button:hover{background:var(--np-soft)}
+.native-preview .np-text-button{color:var(--np-accent);padding:9px 5px;font-size:12px;text-decoration:underline;text-underline-offset:4px}
+.native-preview .np-wide{width:100%}
+.native-preview .np-stack{display:grid;gap:10px;margin-top:19px}
+.native-preview .np-stack>.np-button{width:100%}
+.native-preview .np-kicker{color:var(--np-muted);font-size:11px;line-height:1.5;letter-spacing:.07em;text-transform:uppercase;font-weight:650;margin-bottom:13px}
+.native-preview .np-muted{font-size:12px;line-height:1.65;color:var(--np-muted)}
+.native-preview .np-center{text-align:center}
+.native-preview .np-preview-caption{font-size:10px;line-height:1.6;text-align:center;color:#6b655a;margin-top:12px}
+.native-preview .np-character-picker{display:flex;align-items:center;gap:12px;justify-content:space-between;margin-bottom:17px;font-size:12px;color:var(--np-muted)}
+.native-preview .np-character-picker select{min-width:0;max-width:196px;min-height:44px;padding:7px 25px 7px 10px;border:1px solid var(--np-line);border-radius:9px;background:var(--np-surface);color:var(--np-text);font-size:13px;cursor:pointer}
+.native-preview .np-steps{display:flex;gap:2px;border-bottom:1px solid var(--np-line);margin:0 0 18px;padding-bottom:10px}
+.native-preview .np-steps>.np-button{flex:1;flex-direction:column;gap:4px;padding:5px 2px;font-size:11px;color:var(--np-muted);border-radius:8px;min-height:57px}
+.native-preview .np-steps>.np-button>span{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--np-line);font-size:10px}
+.native-preview .np-steps>.is-selected{color:var(--np-accent);background:var(--np-soft)}
+.native-preview .np-steps>.is-selected>span{background:var(--np-accent);color:var(--np-contrast)}
+.native-preview .np-glyph-card{position:relative;min-height:220px;display:grid;place-items:center;background:var(--np-surface);border:1px solid var(--np-line);border-radius:18px;overflow:hidden}
+.native-preview .np-glyph{display:block;font:500 156px/1.2 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;color:var(--np-text);text-align:center}
+.native-preview .np-expand{position:absolute;right:4px;top:4px;color:var(--np-muted)}
+.native-preview .np-character-meaning{text-align:center;margin:14px 0 0;overflow-wrap:anywhere}
+.native-preview .np-character-meaning>p:not(.np-pinyin){font-size:17px;line-height:1.5}
+.native-preview .np-pinyin{color:var(--np-accent);font-size:17px;line-height:1.5;font-weight:500}
+.native-preview .np-section-line{display:flex;justify-content:space-between;gap:8px;margin-top:16px;border-top:1px solid var(--np-line);padding-top:5px}
+.native-preview .np-recall-card{min-height:260px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:15px;text-align:center;margin-bottom:18px;padding:18px 12px;border:1px solid var(--np-line);border-radius:18px;background:var(--np-surface)}
+.native-preview .np-recall-card .np-kicker{margin:0}
+.native-preview .np-recall-card .np-character-meaning{margin:0}
+.native-preview .np-grade-actions{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:14px}
+.native-preview .np-result{text-align:center;padding:20px 0 17px}
+.native-preview .np-result>h4{font-size:23px;margin:12px 0}
+.native-preview .np-result>p{font-size:16px}
+.native-preview .np-result>p.np-muted{font-size:12px;margin-top:15px}
+.native-preview .np-result-icon{display:grid;place-items:center;width:56px;height:56px;background:var(--np-soft);color:var(--np-accent);border-radius:50%;margin:auto}
+.native-preview .np-result-icon>svg{width:28px;height:28px}
+.native-preview .np-context{background:var(--np-surface);border:1px solid var(--np-line);border-radius:16px;padding:17px 13px;overflow-wrap:anywhere}
+.native-preview .np-context>.np-kicker{margin-bottom:12px;font-size:10px}
+.native-preview .np-sentence{font:normal 28px/1.65 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;margin-bottom:11px;overflow-wrap:anywhere;word-break:normal;display:block}
+.native-preview .np-inline-han{display:inline-flex;vertical-align:baseline;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0 1px;border:0;border-bottom:1px solid var(--np-line);border-radius:0;color:var(--np-text);background:transparent;font:inherit;line-height:1.4}
+.native-preview .np-inline-han:hover{background:var(--np-soft);color:var(--np-accent)}
+.native-preview .np-context>.np-pinyin{font-size:15px;margin:8px 0 12px}
+.native-preview .np-translation{font-size:16px;line-height:1.6}
+.native-preview .np-audio{margin-top:18px;gap:9px;min-width:112px}
+.native-preview .np-recording-note{margin-top:17px}
+.native-preview .np-context-links{display:flex;gap:12px;flex-wrap:wrap}
+.native-preview .np-source-note{font-size:10px;color:var(--np-muted);line-height:1.7;margin-top:15px;overflow-wrap:anywhere}
+.native-preview .np-source-action{text-align:right;margin:4px 0 0}
+.native-preview .np-character-heading{display:flex;align-items:center;gap:17px;margin-bottom:19px}
+.native-preview .np-character-heading>span{font:normal 52px/1.2 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif}
+.native-preview .np-character-heading>div{flex:1;min-width:0;font-size:14px;overflow-wrap:anywhere}
+.native-preview .np-character-heading>div p+p{margin-top:2px}
+.native-preview .np-tabs{display:flex;gap:5px;margin-bottom:17px;flex-wrap:wrap}
+.native-preview .np-pill{min-height:44px;padding:8px 13px;border:1px solid var(--np-line);border-radius:23px;font-size:12px;font-weight:500;background:var(--np-surface)}
+.native-preview .np-pill.is-selected{background:var(--np-soft);color:var(--np-accent);border-color:var(--np-accent);font-weight:650}
+.native-preview .np-art-stage{position:relative;aspect-ratio:1.35;background:var(--np-surface);border-radius:16px;overflow:hidden;border:1px solid var(--np-line);display:grid;place-items:center}
+.native-preview .np-art-canvas{position:absolute;width:74%;height:auto;aspect-ratio:1;inset:50% auto auto 50%;transform:translate(-50%,-50%)}
+.native-preview .np-art-image{position:absolute;display:block;height:auto;max-width:none;user-select:none;filter:none}
+.native-preview[data-preview-theme=dark] .np-art-image{filter:invert(.92)}
+.native-preview .np-no-art,.native-preview .np-art-stage>.np-empty{padding:18px;text-align:center;font-size:13px}
+.native-preview .np-structure{padding:17px 15px;border:1px solid var(--np-line);background:var(--np-surface);border-radius:15px}
+.native-preview .np-structure-glyph{font:normal 76px/1.3 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;text-align:center}
+.native-preview .np-decomposition{font:normal 27px/1.5 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;text-align:center;margin:8px 0 13px}
+.native-preview .np-component-tokens{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0 17px}
+.native-preview .np-component-token{width:57px;height:57px;padding:3px;border:1px solid var(--np-line);background:var(--np-bg);font:normal 32px/1.2 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif}
+.native-preview .np-source-hint{font-size:13px;line-height:1.7;margin-top:15px;border-left:2px solid var(--np-accent);padding-left:10px}
+.native-preview .np-metadata{margin-top:15px;font-size:11px;line-height:1.6}
+.native-preview .np-metadata>div{padding:7px 0;border-top:1px solid var(--np-line)}
+.native-preview .np-metadata dt{font-weight:600;color:var(--np-muted);margin:0}
+.native-preview .np-metadata dd{margin:2px 0 0;overflow-wrap:anywhere;white-space:pre-wrap}
+.native-preview .np-source{font-size:12px;line-height:1.7;overflow-wrap:anywhere;margin-bottom:21px}
+.native-preview .np-source>strong{font-size:14px;display:block;margin-bottom:6px}
+.native-preview .np-source a{display:inline-flex;align-items:center;min-height:44px}
+.native-preview .np-source-heading{margin:20px 0 13px}
+.native-preview .np-source-definition{margin-bottom:16px;font-size:15px;line-height:1.6}
+.native-preview .np-search{display:flex;align-items:center;gap:9px;background:var(--np-surface);border:1px solid var(--np-line);border-radius:11px;padding:0 10px;min-height:48px}
+.native-preview .np-search>svg{color:var(--np-muted);width:18px}
+.native-preview .np-search>input{padding:11px 0;min-width:0;width:100%;border:0;background:transparent;border-radius:3px;outline-offset:0;font-size:12px;min-height:44px}
+.native-preview .np-search>input::placeholder{color:var(--np-muted);opacity:1}
+.native-preview .np-selection-count{color:var(--np-muted);font-size:11px;margin:12px 0 7px}
+.native-preview .np-word-row{position:relative;display:flex;flex-direction:column;align-items:stretch;text-align:left;width:100%;border-bottom:1px solid var(--np-line);border-radius:0;padding:15px 27px 15px 0;gap:4px;background:transparent;font-weight:400}
+.native-preview .np-word-row:hover{background:var(--np-soft)}
+.native-preview .np-word-row>svg{position:absolute;right:0;top:23px;width:17px;color:var(--np-muted)}
+.native-preview .np-word-head{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.native-preview .np-word-head>[lang]{font:normal 25px/1.3 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif}
+.native-preview .np-badge{font-size:9px;border:1px solid var(--np-line);border-radius:6px;white-space:nowrap;padding:2px 5px;color:var(--np-muted)}
+.native-preview .np-word-pinyin{color:var(--np-accent);font-size:13px}
+.native-preview .np-word-summary{font-size:12px;line-height:1.55;color:var(--np-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.native-preview .np-word-detail-heading{margin-bottom:20px;overflow-wrap:anywhere}
+.native-preview .np-word-detail-heading>[lang]{font:normal 43px/1.4 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif}
+.native-preview .np-word-tabs{gap:4px}
+.native-preview .np-word-tabs>.np-pill{padding:7px 10px;font-size:11px}
+.native-preview .np-definitions{font-size:14px;line-height:1.8;padding-left:22px;margin-top:17px;overflow-wrap:anywhere}
+.native-preview .np-definitions>li{padding-left:3px;margin-bottom:11px}
+.native-preview .np-example{padding:0 0 18px;margin-bottom:19px;border-bottom:1px solid var(--np-line);font-size:14px;overflow-wrap:anywhere}
+.native-preview .np-example-zh{font:normal 24px/1.6 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;margin-bottom:10px}
+.native-preview .np-practice-heading{display:flex;align-items:flex-start;gap:12px;justify-content:space-between}
+.native-preview .np-practice-heading>.np-kicker{max-width:185px;font-size:10px}
+.native-preview .np-practice-heading>span{font-size:11px;white-space:nowrap;color:var(--np-muted)}
+.native-preview .np-progress{height:4px;background:var(--np-line);border-radius:4px;margin-bottom:20px;overflow:hidden}
+.native-preview .np-progress>span{display:block;height:100%;background:var(--np-accent)}
+.native-preview .np-quick-card{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:297px;gap:19px;background:var(--np-surface);border:1px solid var(--np-line);border-radius:19px;padding:22px 13px;touch-action:pan-y;user-select:none;will-change:transform}
+.native-preview .np-quick-card>.np-character-meaning{margin:0}
+.native-preview .np-quick-card+.np-wide{margin-top:18px}
+.native-preview .np-swipe-hint{display:flex;justify-content:space-between;gap:4px;font-size:10px;color:var(--np-accent);margin-top:16px}
+.native-preview .np-swipe-hint>span{color:var(--np-muted);font-size:9px}
+.native-preview .np-result>.np-score{font-size:56px;line-height:1.1;font-weight:650;color:var(--np-accent);margin-top:18px}
+.native-preview .np-score>span{font-size:25px;color:var(--np-muted);font-weight:400}
+.native-preview .np-recap-missed{border-top:1px solid var(--np-line);margin-top:15px;padding-top:15px}
+.native-preview .np-literal{margin-top:23px}
+.native-preview .np-literal>h4{margin-bottom:10px}
+.native-preview .np-literal>div{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--np-line);padding:8px 0;font-size:13px}
+.native-preview .np-literal-han{width:47px;min-height:47px;border:1px solid var(--np-line);background:var(--np-surface);font:normal 28px/1.3 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;flex-shrink:0}
+.native-preview .np-literal>div p+p{margin-top:0}
+.native-preview .np-literal .np-pinyin{font-size:13px}
+.native-preview .np-character-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.native-preview .np-character-grid>.np-button{display:flex;flex-direction:column;gap:5px;background:var(--np-surface);border:1px solid var(--np-line);padding:13px 9px;min-height:135px}
+.native-preview .np-character-grid>.np-button>span:first-child{font:normal 48px/1.2 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif}
+.native-preview .np-character-grid>.np-button>span:nth-child(2){color:var(--np-accent);font-size:13px}
+.native-preview .np-character-grid>.np-button>span:last-child{font-size:11px;line-height:1.4;font-weight:400;color:var(--np-muted);overflow-wrap:anywhere}
+.native-preview .np-profile-stats{display:flex;justify-content:space-between;gap:8px;margin:10px 0 23px;padding:21px 10px;background:var(--np-surface);border:1px solid var(--np-line);border-radius:13px}
+.native-preview .np-profile-stats>div{display:flex;flex-direction:column;text-align:center;flex:1}
+.native-preview .np-profile-stats strong{font-size:28px;color:var(--np-accent);font-weight:650}
+.native-preview .np-profile-stats span{color:var(--np-muted);font-size:10px}
+.native-preview .np-section-heading{margin:25px 0 12px}
+.native-preview .np-setting{display:flex;justify-content:space-between;align-items:center;gap:7px;border-block:1px solid var(--np-line);padding:13px 0}
+.native-preview .np-setting>div{display:flex;flex-direction:column;font-size:13px}
+.native-preview .np-setting>div>span{color:var(--np-muted);font-size:11px;margin-top:3px}
+.native-preview .np-setting>.np-button{font-size:11px}
+.native-preview .np-bottom-nav{display:flex;align-items:stretch;flex-shrink:0;min-height:68px;background:var(--np-bg);border-top:1px solid var(--np-line);padding:5px 10px 7px;gap:10px}
+.native-preview .np-bottom-nav>.np-button{display:flex;flex:1;flex-direction:column;gap:4px;border-radius:10px;font-size:10px;font-weight:500;min-height:52px;padding:5px 2px;color:var(--np-muted)}
+.native-preview .np-bottom-nav>.np-button>svg{height:20px;width:20px}
+.native-preview .np-bottom-nav>.is-current{color:var(--np-accent);background:var(--np-soft)}
+.native-preview .np-announcement{font-size:11px;line-height:1.6;padding:0 17px;color:var(--np-accent);flex-shrink:0}
+.native-preview .np-announcement:not(:empty){padding-block:8px;border-top:1px solid var(--np-line)}
+.native-preview .np-loading{min-height:596px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:20px;padding:25px;background:var(--np-bg);font-size:13px}
+.native-preview .np-wordmark{font-size:25px;font-weight:650;letter-spacing:-.05em;color:var(--np-accent)}
+.native-preview .np-empty{padding:25px 8px;font-size:13px;line-height:1.7;text-align:center;color:var(--np-muted)}
+.native-preview .np-empty>h4{color:var(--np-text);margin-bottom:10px}
+.native-preview .np-empty>.np-button{margin-top:15px}
+.native-preview .np-modal-backdrop{position:absolute;inset:0;z-index:10;background:#19171272;padding:12px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.native-preview .np-dialog{display:flex;flex-direction:column;max-height:96%;min-width:0;width:100%;border:1px solid var(--np-line);background:var(--np-bg);border-radius:19px;overflow:hidden;box-shadow:0 12px 30px #0003}
+.native-preview .np-dialog>header{display:flex;align-items:center;justify-content:space-between;gap:5px;border-bottom:1px solid var(--np-line);padding:10px 8px 10px 16px;flex-shrink:0}
+.native-preview .np-dialog>header>h4{font-size:16px;line-height:1.4}
+.native-preview .np-dialog-content{padding:18px 16px;overflow-y:auto;overscroll-behavior:contain;font-size:13px;line-height:1.7}
+.native-preview .np-dialog-content>h4{margin:10px 0 16px}
+.native-preview .np-dialog-content>.np-wide{margin:13px 0 8px;font-size:12px}
+.native-preview .np-dialog-content>.np-source{margin-top:22px}
+.native-preview .np-expanded-glyph{font:normal clamp(110px,20vw,180px)/1.3 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;text-align:center;margin:15px 0 20px}
+.native-preview .np-inspect-glyph{font:normal 64px/1.3 "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;text-align:center}
+.native-preview .np-dialog-content>.np-structure{margin-top:20px}
+.native-preview .np-dialog-content>.np-structure .np-structure-glyph{display:none}
+@media(max-width:380px){.native-preview .np-phone{border-width:6px;border-radius:26px}.native-preview .np-screen{border-radius:20px}.native-preview .np-content{padding-inline:13px}.native-preview .np-app{height:625px;min-height:560px;max-height:none}.native-preview .np-header{min-height:61px}.native-preview .np-tabs{gap:4px}.native-preview .np-pill{padding-inline:10px}.native-preview .np-word-tabs>.np-pill{padding-inline:8px;font-size:10px}.native-preview .np-quick-card{min-height:270px}.native-preview .np-character-picker{gap:7px}.native-preview .np-character-picker select{max-width:178px}}
+@media(prefers-reduced-motion:reduce){.native-preview .np-content{scroll-behavior:auto}.native-preview *{transition:none!important;animation:none!important}}

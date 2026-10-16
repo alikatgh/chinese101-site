@@ -1,0 +1,11 @@
+Make Me a Hanzi dictionary data. Source: https://github.com/skishore/makemeahanzi
+Author: Shaunak Kishore; upstream dictionary sources: Unihan and CJKlib.
+Pinned source revision: bddc96d41bef78427ed0e034e9f7e31d71fd1b92
+Dictionary SHA-256: 744bb05d5b0742e9ee35c37791f94d56a173349b3367569e7ca11e510364d203
+Upstream license: GNU Lesser General Public License version 3 or later.
+Original upstream COPYING notice and LGPL/GPL license texts are bundled unchanged.
+The unmodified complete dictionary source is bundled as dictionary.txt.gz.
+Adaptation: select existing catalog characters, preserve original source field values, and add provenance/index metadata.
+No new definitions, readings, formation hints, or mnemonic pictures were authored for this import.
+Source line numbers and SHA-256 hashes identify the original records; sourceRecordSha256 excludes line terminators.
+Stroke matching data is omitted because alignment with the app's existing stroke geometry is unverified.

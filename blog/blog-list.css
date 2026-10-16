@@ -1,0 +1,282 @@
+/* Blog-only reading rhythm; loaded after the shared editorial styles. */
+.blog-main .blog-feed {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 40px;
+  width: min(1040px, calc(100% - 80px));
+  padding: 56px 0 88px;
+}
+
+.blog-feed > .post-card,
+.blog-feed > .post-card + .post-card {
+  min-width: 0;
+  margin: 0;
+  padding: 34px 38px;
+  border: 1px solid #e0d6c4;
+  border-radius: 12px;
+  background: #f2ecdf;
+}
+
+.blog-feed .post-copy {
+  min-width: 0;
+  padding: 0;
+}
+
+.blog-feed .post-card :is(.eyebrow, .update-label) {
+  max-width: none;
+  margin: 0 0 12px;
+  color: #6c614f;
+  font-size: 11px;
+  line-height: 1.6;
+  letter-spacing: .09em;
+}
+
+.blog-feed .post-card h2 {
+  max-width: 780px;
+  margin: 0 0 16px !important;
+  font-size: clamp(29px, 3.1vw, 36px) !important;
+  line-height: 1.18 !important;
+  letter-spacing: -.035em;
+  overflow-wrap: anywhere;
+}
+
+.blog-feed .post-card h2 a {
+  display: inline-block;
+  min-height: 44px;
+}
+
+.blog-feed .post-card h2 a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+}
+
+.blog-feed .post-card p:not(.eyebrow, .update-label, .small-note) {
+  max-width: 720px;
+  color: #535447;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.blog-main .text-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  max-width: 100%;
+  margin-top: 16px;
+  padding-block: 8px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.blog-feed .photo-post {
+  display: grid;
+  grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr);
+  align-items: center;
+  gap: 32px;
+  overflow: visible;
+}
+
+.blog-feed .post-photo {
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.blog-feed .post-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Keep the existing local Stories announcement in the same card system. */
+.blog-feed .stories-post {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 220px);
+  align-items: center;
+  gap: 32px;
+}
+
+.blog-feed .stories-post .small-note {
+  margin-top: 14px;
+  color: #62644f;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.blog-feed .stories-post-image {
+  display: block;
+  align-self: center;
+  width: min(100%, 200px);
+  max-height: 320px;
+  margin: 0 auto;
+  border: 1px solid #c9cbbb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.blog-feed .stories-post-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.blog-feed .editorial-aside {
+  min-width: 0;
+  margin: 0;
+  padding-top: 28px;
+  border-top: 1px solid #d7cdbb;
+}
+
+.blog-feed .editorial-aside h2 {
+  margin-bottom: 12px;
+  font-size: 26px !important;
+  line-height: 1.25;
+}
+
+.blog-feed .editorial-aside p {
+  max-width: 720px;
+  color: #535447;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.blog-feed .editorial-aside a {
+  display: inline-block;
+  min-height: 44px;
+  padding-block: 8px;
+}
+
+/* These controls are shared markup, with touch sizing only on blog pages. */
+.editorial .site-header {
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
+.editorial .site-header nav,
+.editorial .language-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 18px;
+}
+
+.editorial .language-switch {
+  gap: 4px 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.editorial :is(.site-header, .site-footer) :is(a, button) {
+  display: inline-flex;
+  align-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding-block: 8px;
+}
+
+.editorial .site-footer .footer-brand {
+  display: block;
+}
+
+.editorial .site-footer > div {
+  gap: 4px 20px;
+}
+
+.editorial .language-switch a {
+  padding-inline: 4px;
+}
+
+.editorial .skip-link,
+.editorial .cookie-panel button {
+  min-height: 44px;
+}
+
+.editorial :is(.blog-main, .site-header, .site-footer) :is(a, button):focus-visible {
+  outline: 3px solid var(--rust, #a33515);
+  outline-offset: 4px;
+}
+
+@media (max-width: 800px) {
+  .editorial .site-header nav {
+    order: 3;
+    width: 100%;
+  }
+
+  .blog-feed > .post-card,
+  .blog-feed > .post-card + .post-card {
+    padding: 28px;
+  }
+
+  .blog-feed .photo-post {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .blog-feed .post-photo {
+    aspect-ratio: 3 / 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .blog-main .blog-feed {
+    gap: 24px;
+    width: calc(100% - 40px);
+    padding: 32px 0 56px;
+  }
+
+  .blog-feed > .post-card,
+  .blog-feed > .post-card + .post-card {
+    padding: 22px;
+  }
+
+  .blog-feed .post-card h2 {
+    font-size: 28px !important;
+    line-height: 1.2 !important;
+  }
+
+  .blog-feed .post-card :is(.eyebrow, .update-label) {
+    font-size: 10px;
+    letter-spacing: .07em;
+  }
+
+  .blog-feed .photo-post,
+  .blog-feed .stories-post {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .blog-feed .stories-post-image {
+    max-height: 280px;
+  }
+
+  .blog-feed .editorial-aside {
+    padding-top: 24px;
+  }
+
+  .blog-feed .editorial-aside h2 {
+    font-size: 24px !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .editorial .site-header nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px 12px;
+    font-size: 11px;
+  }
+
+  .editorial .site-header nav a {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .blog-feed .post-card h2 {
+    font-size: 27px !important;
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "release": "2026-10-16-native-learning-development",
+  "release": "2026-10-16-interactive-native-preview",
   "websiteLocales": [
     "en",
     "es",
@@ -11,5 +11,6 @@
   "vietnameseDictionaryEntries": 242,
   "latestPost": "/blog/a-clearer-way-to-learn/",
   "latestBlogUpdate": "2026-10-16",
-  "latestDevelopmentUpdate": "2026-10-16"
+  "latestDevelopmentUpdate": "2026-10-16",
+  "latestWebsiteUpdate": "2026-10-16"
 }

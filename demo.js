@@ -16,8 +16,10 @@
     return dataPromise;
   }
   function stopAudio() { if (activeAudio) { activeAudio.pause(); activeAudio = null; } }
+  window.addEventListener('chinese101:audio-start', event => { if (event.detail?.owner !== 'classic-preview') stopAudio(); });
   function sound(file, button, status) {
     stopAudio();
+    window.dispatchEvent(new CustomEvent('chinese101:audio-start', {detail:{owner:'classic-preview'}}));
     const player = new Audio(asset(file)); activeAudio = player;
     const label = button.textContent;
     button.textContent = 'Playing…'; button.disabled = true;
