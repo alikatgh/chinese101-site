@@ -1,5 +1,5 @@
 {
-  "release": "2026-09-21-localization-vi",
+  "release": "2026-10-16-native-learning-development",
   "websiteLocales": [
     "en",
     "es",
@@ -9,6 +9,7 @@
   "spanishDictionaryEntries": 3500,
   "vietnameseLessons": 19,
   "vietnameseDictionaryEntries": 242,
-  "latestPost": "/blog/readiness-scan-cold-email/",
-  "latestBlogUpdate": "2026-10-16"
+  "latestPost": "/blog/a-clearer-way-to-learn/",
+  "latestBlogUpdate": "2026-10-16",
+  "latestDevelopmentUpdate": "2026-10-16"
 }
