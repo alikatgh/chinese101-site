@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An unsolicited “readiness scan” after our Reddit post — Chinese 101</title>
+<meta name="description" content="A cold site-audit pitch reached Chinese 101 after a Reddit post. What its email headers show, what they do not, and four copyable infrastructure abuse-report templates.">
+<link rel="canonical" href="https://chinese.aulenor.com/blog/readiness-scan-cold-email/">
+<meta property="og:title" content="An unsolicited “readiness scan” after our Reddit post">
+<meta property="og:description" content="What the email headers show, what they do not, and four copyable abuse-report templates for other builders.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://chinese.aulenor.com/blog/readiness-scan-cold-email/">
+<meta property="og:image" content="https://chinese.aulenor.com/assets/app-icon.png">
+<meta property="article:published_time" content="2026-10-16">
+<link rel="icon" href="/assets/app-icon.png">
+<link rel="stylesheet" href="/style.css?v=20260927-stories">
+<link rel="stylesheet" href="./article.css?v=20261016">
+<link rel="alternate" type="application/rss+xml" title="Chinese 101 announcements" href="/blog/feed.xml">
+<link rel="alternate" hreflang="en" href="https://chinese.aulenor.com/blog/readiness-scan-cold-email/">
+<link rel="alternate" hreflang="x-default" href="https://chinese.aulenor.com/blog/readiness-scan-cold-email/">
+<script src="/site.js?v=3" defer></script>
+<script src="./copy-reports.js?v=20261016" defer></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"An unsolicited readiness scan after our Reddit post","description":"What the email headers show, what they do not, and four copyable abuse-report templates for other builders.","datePublished":"2026-10-16","dateModified":"2026-10-16","inLanguage":"en","mainEntityOfPage":"https://chinese.aulenor.com/blog/readiness-scan-cold-email/","image":"https://chinese.aulenor.com/assets/app-icon.png","author":{"@type":"Organization","name":"Aulenor"},"publisher":{"@type":"Organization","name":"Aulenor"}}</script>
+</head>
+<body class="editorial field-note">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <a class="parent-brand" href="https://aulenor.com/">aulenor<span> / </span></a>
+  <nav aria-label="Main navigation"><a href="/#features">Explore</a><a href="/#plans">Free &amp; Premium</a><a href="/blog/">Blog</a><a href="/changelog/">Changelog</a><a href="/feedback/">Feedback</a><a href="/support/">Help ↗</a></nav>
+  <div class="language-switch" aria-label="Language / Idioma"><a lang="en" href="./" aria-current="page">English</a><a lang="es" href="/es/blog/">Español</a><a lang="vi" href="/vi/">Tiếng Việt</a></div>
+</header>
+<main id="main" class="editorial-main">
+<article>
+  <header class="field-note-heading">
+    <a class="text-link" href="/blog/">← All notes</a>
+    <p class="eyebrow"><time datetime="2026-10-16">16 October 2026</time> · From the studio</p>
+    <h1>An unsolicited “readiness scan” after our Reddit post.</h1>
+    <p class="lead">We shared Chinese 101. A site-audit pitch followed. Here’s what the email headers tell us, where the evidence stops, and how other builders can report a message they received.</p>
+  </header>
+  <aside class="app-invitation" aria-label="About Chinese 101"><p>Came here from r/SideProject? We’re building <strong>Chinese 101</strong> to make Chinese characters and vocabulary easier to explore.</p><a href="/#features">Try Chinese 101 →</a></aside>
+  <nav class="article-jumps" aria-label="In this article"><a href="#the-email">The email</a><a href="#headers">The headers</a><a href="#replies">Replies &amp; unsubscribe</a><a href="#report-templates">Copy a report</a></nav>
+  <div class="prose article-body">
+    <section id="the-email">
+      <h2>The pitch that arrived.</h2>
+      <p>After we shared <a href="/">Chinese 101</a> on r/SideProject, our project inbox received an email with the subject <q>chinese.aulenor.com: images that are far too heavy</q>. The sender said they had found the site through the subreddit, run a “readiness scan,” and given it a score of <strong>70/100</strong>.</p>
+      <p>The pitch mentioned <q>Crawl &amp; links: 1 image referenced by the site is over 1 MB</q>, offered the top five of 22 findings, and linked to a domain-specific scan page with a paid report. We have not independently verified the scan, its score, or its findings.</p>
+      <p>We inspected the email source rather than replying or visiting the sales link. This article describes one unsolicited message. Its timing, personalization and lead identifier are consistent with automated outreach; they do not prove a subreddit-monitoring script, its implementation, or the campaign’s size.</p>
+    </section>
+    <section id="headers">
+      <h2>Delivery evidence, with limits.</h2>
+      <p>These are shortened, redacted excerpts supplied with the message. IP addresses, sender domains and recipient-specific identifiers are masked here. Keep the complete original when reporting privately.</p>
+      <pre class="header-excerpt" tabindex="0" aria-label="Redacted email header excerpts"><code>Received: from mail61.out.titan.email ([44.210.xxx.xx])
+Received: from api.[redacted].com ([162.220.xxx.xx])
+  by smtp-out.flockmail.com (Postfix) with ESMTPA
+Feedback-ID: [redacted]:flockmailId
+List-Unsubscribe: &lt;https://api.[redacted].com/api/u/[token-redacted]&gt;
+X-Lead-Email-Id: [message-id-redacted]</code></pre>
+      <dl class="header-findings">
+        <dt>ESMTPA</dt><dd>The receiving relay records successful SMTP authentication. It does not identify the application or prove that a bot composed the message. This meaning is defined in <a href="https://www.rfc-editor.org/info/rfc3848/">RFC 3848</a>.</dd>
+        <dt>Titan / Flockmail</dt><dd>The server names indicate those mail systems appear in the supplied delivery chain. A provider can use the full original, timestamp and queue identifiers to investigate the account involved.</dd>
+        <dt>Hosting clues</dt><dd>The unmasked origin address falls within a range <a href="https://station.railway.com/questions/ip-address-of-railway-servers-ce31c81a">Railway has publicly identified</a>. The outbound address falls within a range <a href="https://ip-ranges.amazonaws.com/ip-ranges.json">AWS publishes</a> for EC2 in us-east-1. Neither fact reveals what software ran there or who controlled the address when the message was sent.</dd>
+        <dt>Neo and lead metadata</dt><dd>The reported <code>neo1</code> DKIM selector and <code>neo.space</code> SPF reference are clues to check, not a verified Neo account attribution. A selector’s name is arbitrary. <code>X-Lead-Email-Id</code> is sender-defined metadata consistent with lead tracking, not proof of scraping.</dd>
+      </dl>
+      <p>Reliable attribution needs the full header chain and authentication results, checked from the recipient’s trusted mail system. A copied header excerpt alone cannot authenticate itself. We have not established that Amazon SES was used.</p>
+    </section>
+    <section id="replies">
+      <h2>Why we didn’t reply.</h2>
+      <p>You do not need to engage with an unsolicited pitch. For suspicious mail, <a href="https://support.google.com/mail/answer/1366858?hl=en">Google recommends avoiding replies and suspicious links, and reporting spam</a>. That is a sufficient reason to use the mail client’s spam control.</p>
+      <p>It would be an overstatement to say that an angry reply is the “single strongest” trust signal, or that it improves delivery to thousands of other people. <a href="https://support.google.com/mail/answer/186543">Google lists replies among several signals for personal importance predictions</a>; that does not establish a universal, domain-wide reputation boost.</p>
+      <p>A unique unsubscribe token is also normal: it identifies the subscription to remove. <a href="https://www.rfc-editor.org/rfc/rfc8058.html">RFC 8058 describes opaque identifiers and automated URL fetching</a>. Such a link can disclose activity, but its presence does not prove a fake unsubscribe mechanism or a human visitor. Treat links in suspicious mail cautiously; use your mail provider’s reporting controls.</p>
+      <p>The pitch’s postal address and advertising disclosure do not prove a “legal loophole.” The <a href="https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business">FTC’s CAN-SPAM guide</a> permits appropriate postal addresses and reply-based opt-outs, alongside other requirements. Legal compliance and a provider’s acceptable-use policy are separate questions.</p>
+    </section>
+    <section id="report-templates" aria-labelledby="reports-title">
+      <p class="eyebrow">For a message you received</p>
+      <h2 id="reports-title">Four reports you can copy.</h2>
+      <p>Save the original message as an <code>.eml</code> file, or export its full headers and body. Apple Mail exposes Raw Source with <kbd>⌥⌘U</kbd>; Gmail offers <strong>More → Show original</strong>. Replace the bracketed fields below and attach that original privately.</p>
+      <p>Report your own incident to providers supported by your evidence. These templates request an investigation; they do not promise suspension or establish a policy violation. <a href="https://railway.com/legal/acceptable-use">Railway prohibits unsolicited bulk messages</a>, and <a href="https://support.titan.email/hc/en-us/articles/900000775226-Titan-Acceptable-Use-Policy">Titan sets conditions for commercial mail</a>. SMTP automation alone is not proof of abuse.</p>
+      <section class="report-template" aria-labelledby="railway-title">
+        <div class="report-heading"><div><p class="eyebrow">01 / Hosting</p><h3 id="railway-title">Railway</h3></div><button type="button" data-copy-report="railway-report" aria-label="Copy Railway report" hidden>Copy report</button></div>
+        <p class="report-route">To: <a href="mailto:abuse@railway.com">abuse@railway.com</a> · <a href="https://docs.railway.com/platform/support">Official reporting channel ↗</a></p>
+        <pre tabindex="0"><code id="railway-report">Subject: Unsolicited commercial email — suspected Railway resource
+
+Hello Railway abuse team,
+
+I received an unsolicited readiness-scan sales pitch that I did not request.
+
+Sender: [sender email and domain]
+Recipient: [your email]
+Received at: [date, time and time zone / UTC]
+Email subject: [original subject]
+Origin IP in the trusted Received chain: [unmasked IP]
+SMTP relay and queue ID: [relay and queue ID]
+
+The origin address appears associated with Railway infrastructure. Please verify which resource controlled it at the message timestamp and investigate whether the activity violates your acceptable-use policy. One message does not establish the campaign's volume or scraper implementation.
+
+The original email with full headers is attached. Please let me know if further evidence is needed.
+
+[Your name]</code></pre><p class="copy-status" role="status" aria-live="polite"></p>
+      </section>
+      <section class="report-template" aria-labelledby="titan-title">
+        <div class="report-heading"><div><p class="eyebrow">02 / Mail delivery</p><h3 id="titan-title">Titan</h3></div><button type="button" data-copy-report="titan-report" aria-label="Copy Titan report" hidden>Copy report</button></div>
+        <p class="report-route">To: <a href="mailto:abuse@titan.email">abuse@titan.email</a> · <a href="https://support.titan.email/hc/en-us/articles/5680799089561-How-to-report-abuse-on-Titan">Official instructions ↗</a></p>
+        <pre tabindex="0"><code id="titan-report">Subject: Titan- Abuse Report [sender email]
+
+Hello Titan abuse team,
+
+I received an unsolicited commercial readiness-scan pitch that I did not request or consent to receive.
+
+Sender: [sender email and domain]
+Recipient: [your email]
+Received at: [date, time and time zone / UTC]
+Email subject: [original subject]
+Titan/Flockmail relay: [hostname]
+Postfix queue ID / Feedback-ID: [values from the original]
+X-Titan-User-Uid / X-Lead-Email-Id: [values, if present]
+
+The Received chain references Titan/Flockmail infrastructure. Please examine the attached original, confirm whether an account or service under your control sent the message, and investigate any breach of your policies.
+
+Please let me know if further evidence is needed.
+
+[Your name]</code></pre><p class="copy-status" role="status" aria-live="polite"></p>
+      </section>
+      <section class="report-template" aria-labelledby="neo-title">
+        <div class="report-heading"><div><p class="eyebrow">03 / Mail service</p><h3 id="neo-title">Neo</h3></div><button type="button" data-copy-report="neo-report" aria-label="Copy Neo report" hidden>Copy report</button></div>
+        <p class="report-route">To: <a href="mailto:abuse@neo.space">abuse@neo.space</a> · <a href="https://support.neo.space/hc/en-us/articles/32994675616153-How-to-report-abuse-on-Neo">Official instructions ↗</a></p>
+        <pre tabindex="0"><code id="neo-report">Subject: Neo-Abuse Report [sender email or domain]
+
+Hello Neo abuse team,
+
+I received an unsolicited commercial readiness-scan pitch.
+
+Sender: [sender email and domain]
+Recipient: [your email]
+Received at: [date, time and time zone / UTC]
+Email subject: [original subject]
+Neo-related clues: [DKIM signing domain and selector, SPF references]
+Authentication results: [values from your receiving provider]
+
+These clues are not conclusive proof of a Neo account. Please examine the attached original email and full headers, determine whether your service was involved, and investigate any policy violation.
+
+Please let me know if further evidence is needed.
+
+[Your name]</code></pre><p class="copy-status" role="status" aria-live="polite"></p>
+      </section>
+      <section class="report-template" aria-labelledby="aws-title">
+        <div class="report-heading"><div><p class="eyebrow">04 / Cloud infrastructure</p><h3 id="aws-title">AWS</h3></div><button type="button" data-copy-report="aws-report" aria-label="Copy AWS report" hidden>Copy report</button></div>
+        <p class="report-route">To: <a href="mailto:trustandsafety@support.aws.com">trustandsafety@support.aws.com</a> · <a href="https://aws.amazon.com/security/vulnerability-reporting/">Official AWS abuse channel ↗</a></p>
+        <pre tabindex="0"><code id="aws-report">Subject: Suspected unsolicited email involving an AWS IP
+
+Hello AWS Trust &amp; Safety team,
+
+I received an unsolicited commercial readiness-scan pitch. The original email's Received chain includes an address in a published AWS range.
+
+AWS IP address: [unmasked IP]
+Date and time of activity: [UTC timestamp]
+Sender: [sender email and domain]
+Recipient: [your email]
+Email subject: [original subject]
+Relay hostname and queue ID: [values from the original]
+
+Please investigate whether this resource was involved in sending the message and whether its use violates your policies. I have not established Amazon SES involvement or the identity of the customer controlling the IP at that time.
+
+The original email with full headers is attached. Please let me know if further evidence is needed.
+
+[Your name]</code></pre><p class="copy-status" role="status" aria-live="polite"></p>
+      </section>
+      <p class="report-note">Copying a template does not send anything. Keep recipients’ personal details and unique tokens out of public posts; provide the complete evidence privately to the appropriate provider.</p>
+    </section>
+    <section id="sources">
+      <h2>What we’d tell another builder.</h2>
+      <p>You can ignore an unsolicited sales pitch, report it as spam, and preserve evidence if you want the relevant provider to investigate. Describe what you actually received. Separate observed delivery details from guesses about automation, legality or intent.</p>
+      <p>Provider contacts and source links above were checked on 16 October 2026. Hosting ranges and reporting routes can change; confirm the current official instructions before sending. This note is available in English.</p>
+    </section>
+    <aside class="app-invitation app-invitation-bottom" aria-label="Explore Chinese 101"><p>Back to what we’re building: <strong>Chinese 101</strong>, a place to explore Chinese characters, vocabulary and daily practice.</p><a href="/#features">Try Chinese 101 →</a></aside>
+    <p class="article-end">More <a href="/blog/">notes from the studio</a> · <a href="/blog/feed.xml">Follow by RSS</a></p>
+  </div>
+</article>
+</main>
+<footer class="site-footer"><a class="footer-brand" href="/">Chinese 101<span>By Aulenor.</span></a><div><a href="/blog/">Blog</a><a href="/changelog/">Changelog</a><a href="/feedback/">Feedback</a><a href="/support/">Support</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><button type="button" data-privacy-settings>Cookie choices</button></div><small>© 2026 Aulenor</small></footer>
+</body>
+</html>
